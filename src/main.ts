@@ -12,7 +12,7 @@ async function bootstrap() {
     .addTag('Buddycount')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('swagger', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }
