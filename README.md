@@ -111,3 +111,40 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ### Push to GitHub Container Registry [(more infos)](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 ```docker push ghcr.io/buddycount/buddycount-api:latest```
+
+## Setting up the VM
+
+
+### Install Docker
+
+From Docker's documentation:
+```
+sudo apt update
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+```
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+```
+sudo docker run hello-world
+```
+
+### Pull the image from GHCR
+```docker pull ghcr.io/buddycount/buddycount-api:latest```
+
+### Run the container
+```docker run -p 3000:3000 ghcr.io/buddycount/buddycount-api:latest```
