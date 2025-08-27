@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ExpenseModule } from './expense/expense.module';
 import { join } from 'path';
 import { UserModule } from './user/user.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from './user/user.module';
     }),
     ExpenseModule,
     UserModule,
+    GroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
