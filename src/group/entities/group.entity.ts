@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Currency } from "src/utils/types";
 
 @Entity()
 export class Group {
@@ -10,6 +11,9 @@ export class Group {
 
     @Column({ type: 'varchar', length: 255 })
     description: string;
+
+    @Column({ type: 'enum', enum: Currency })
+    currency: Currency;
 
     // TODO: add icons, ...
 }
