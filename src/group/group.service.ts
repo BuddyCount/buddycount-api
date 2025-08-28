@@ -22,11 +22,11 @@ export class GroupService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
+  update(id: string, updateGroupDto: UpdateGroupDto) {
     return this.groupRepository.update(id, updateGroupDto);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.groupRepository.delete(id);
   }
 }
