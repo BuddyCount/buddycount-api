@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Currency, UserIndex } from "src/utils/types";
 
 export class CreateGroupDto {
     @ApiProperty({
@@ -12,4 +13,16 @@ export class CreateGroupDto {
         example: 'Family group',
     })
     description: string;
+
+    @ApiProperty({
+        description: 'The currency of the group',
+        example: 'CHF',
+    })
+    currency: Currency;
+
+    @ApiProperty({
+        description: 'The users of the group',
+        example: [{ id: '1', name: 'John Doe' }],
+    })
+    users: UserIndex[];
 }

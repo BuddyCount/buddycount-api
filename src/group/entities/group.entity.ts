@@ -1,11 +1,15 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Currency } from "src/utils/types";
+import { Column, CreateDateColumn, Entity, Generated, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from "typeorm";
+import { Currency, UserIndex } from "src/utils/types";
 import { Expense } from "src/expense/entities/expense.entity";
 
 @Entity()
 export class Group {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
+
+    @Column()
+    @Generated("uuid")
+    linkToken: string;
 
     @Column({ type: 'varchar', length: 30 })
     name: string;
@@ -15,6 +19,19 @@ export class Group {
 
     @Column({ type: 'enum', enum: Currency })
     currency: Currency;
+
+    @Column("simple-json")
+    users: UserIndex[];
+
+    /* Metadata, auto-generated */
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+
+    @VersionColumn()
+    version: number;
 
     // TODO: add icons, ...
 

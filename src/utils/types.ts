@@ -3,3 +3,8 @@ export enum Currency {
     EUR = 'EUR',
     CHF = 'CHF',
 }
+
+export type UserIndex = {
+    id: string;
+    name: string;
+}
