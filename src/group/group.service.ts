@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { Repository } from 'typeorm';
+import { Group } from './entities/group.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class GroupService {
+
+  constructor(
+    @InjectRepository(Group)
+    private readonly groupRepository: Repository<Group>,
+  ) { }
+
   create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
+    const group = this.groupRepository.create(createGroupDto);
+    return this.groupRepository.save(group);
   }
 
-  findAll() {
-    return `This action returns all group`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  findOne(id: string) {
+    return this.groupRepository.findOne({ where: { id } });
   }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+    return this.groupRepository.update(id, updateGroupDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} group`;
+    return this.groupRepository.delete(id);
   }
 }
