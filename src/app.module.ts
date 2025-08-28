@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExpenseModule } from './expense/expense.module';
 import { join } from 'path';
-import { UserModule } from './user/user.module';
 import { GroupModule } from './group/group.module';
 
 @Module({
@@ -23,7 +22,6 @@ import { GroupModule } from './group/group.module';
       // logging: true,
     }),
     ExpenseModule,
-    UserModule,
     GroupModule,
   ],
   controllers: [AppController],
