@@ -17,14 +17,14 @@ export class Expense {
     currency: Currency;
 
     // @Column({ type: 'decimal', precision: 15, scale: 8 }) // TODO: use decimal for this and amount ?
-    @Column()
+    @Column({ type: 'float' })
     exchange_rate: number;
 
     @Column()
     date: Date;
 
     // @Column({ type: 'decimal', precision: 10, scale: 2 })
-    @Column()
+    @Column({ type: 'float' })
     amount: number;
 
     @Column('simple-json')
