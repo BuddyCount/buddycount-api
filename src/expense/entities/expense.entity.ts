@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Group } from 'src/group/entities/group.entity';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Expense {
@@ -7,4 +8,11 @@ export class Expense {
 
     @Column({ type: 'varchar', length: 30 })
     name: string;
+
+    /* Relations */
+
+    // Group
+    @ManyToMany(() => Group, (group) => group.expenses)
+    @JoinTable()
+    groups: Group[];
 }

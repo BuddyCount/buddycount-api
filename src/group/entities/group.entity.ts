@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Currency } from "src/utils/types";
+import { Expense } from "src/expense/entities/expense.entity";
 
 @Entity()
 export class Group {
@@ -16,4 +17,10 @@ export class Group {
     currency: Currency;
 
     // TODO: add icons, ...
+
+    /* Relations */
+
+    // Expense
+    @ManyToMany(() => Expense, (expense) => expense.groups)
+    expenses: Expense[];
 }
