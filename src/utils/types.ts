@@ -27,6 +27,6 @@ export type UserShare = {
 }
 
 export type PaidDetails = {
-    repartitionType: 'EQUAL' | 'PORTIONS' | 'AMOUNT';
-    repartition?: UserShare[]; // only used if not EQUAL repartition
+    repartitionType: 'PORTIONS' | 'AMOUNT';
+    repartition: UserShare[];
 }
