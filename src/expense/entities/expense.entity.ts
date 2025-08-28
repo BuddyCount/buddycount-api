@@ -1,6 +1,6 @@
 import { Group } from 'src/group/entities/group.entity';
 import { Currency, ExpenseCategory, PaidDetails } from 'src/utils/types';
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
 @Entity()
 export class Expense {
@@ -46,7 +46,6 @@ export class Expense {
     /* Relations */
 
     // Group
-    @ManyToMany(() => Group, (group) => group.expenses)
-    @JoinTable()
-    groups: Group[];
+    @ManyToOne(() => Group, (group) => group.expenses)
+    group: Group;
 }

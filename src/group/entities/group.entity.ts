@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Generated, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Generated, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from "typeorm";
 import { Currency, UserIndex } from "src/utils/types";
 import { Expense } from "src/expense/entities/expense.entity";
 
@@ -38,6 +38,6 @@ export class Group {
     /* Relations */
 
     // Expense
-    @ManyToMany(() => Expense, (expense) => expense.groups)
+    @OneToMany(() => Expense, (expense) => expense.group)
     expenses: Expense[];
 }
