@@ -33,6 +33,13 @@ let paidForExample: PaidDetails = {
 }
 
 export class CreateExpenseDto {
+
+    @ApiProperty({
+        description: 'The id of the group',
+        example: '2f9ace4b-9698-403e-b573-11ed9a3f22e0',
+    })
+    groupId: string;
+
     @IsString()
     @IsNotEmpty()
     @Length(1, 30)
