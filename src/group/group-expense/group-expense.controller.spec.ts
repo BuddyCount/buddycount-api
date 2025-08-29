@@ -26,8 +26,6 @@ describe('GroupExpenseController', () => {
         },
       }
     ],
-      }],
-
     }).compile();
 
     controller = module.get<GroupExpenseController>(GroupExpenseController);
