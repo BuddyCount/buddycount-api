@@ -45,6 +45,9 @@ export class Expense {
 
     /* Relations */
 
+    @Column({ type: 'uuid' })
+    groupId: string;
+
     // Group
     @ManyToOne(() => Group, (group) => group.expenses)
     group: Group;

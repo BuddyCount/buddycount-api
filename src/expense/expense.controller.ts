@@ -1,22 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
-import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) { }
 
-  @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expenseService.create(createExpenseDto);
-  }
-
   // TODO: remove or edit this, no one should be able to access all expenses at once, only all expenses of a group
-  @Get()
-  findAll() {
-    return this.expenseService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.expenseService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

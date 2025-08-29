@@ -9,7 +9,7 @@ export const dataSourceOptions: DataSourceOptions = {
     username: process.env.POSTGRES_USER || 'backend',
     password: process.env.POSTGRES_PASSWORD || 'backend',
     database: process.env.POSTGRES_DB || 'backend',
-    entities: [join(__dirname, '**', '*.entity.{js,ts}')],
+    entities: [join(__dirname, '..', '..', '**', '*.entity.{js,ts}')],
     synchronize: true, //FIXME: WARNING DANGEROUS FOR PRODUCTION
     // logging: true,
 };
