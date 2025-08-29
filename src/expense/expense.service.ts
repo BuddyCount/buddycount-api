@@ -17,9 +17,7 @@ export class ExpenseService {
     private readonly groupService: GroupService,
   ) { }
 
-  // TODO : issue with udpateExpenseDto -> does not have paidBy and paidFor
-  // so we cannot get concerned user ids from it
-  private getConcernedUserIds(expenseDto: CreateExpenseDto /*| UpdateExpenseDto*/): string[] {
+  private getConcernedUserIds(expenseDto: CreateExpenseDto | UpdateExpenseDto): string[] {
     const paidByIds = expenseDto.paidBy?.repartition?.map((r: any) => String(r.userId)) || [];
     const paidForIds = expenseDto.paidFor?.repartition?.map((r: any) => String(r.userId)) || [];
     return Array.from(new Set([...paidByIds, ...paidForIds]));
@@ -33,8 +31,7 @@ export class ExpenseService {
     }
   }
 
-  // TODO : same issue with updateExpenseDto
-  private validatePaidByAmount(expenseDto: CreateExpenseDto /*| UpdateExpenseDto*/) {
+  private validatePaidByAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
     if (expenseDto.paidBy?.repartitionType === "AMOUNT") {
       const total = expenseDto.paidBy.repartition
         .map((r: any) => Number(r.values?.amount) || 0)
@@ -63,8 +60,11 @@ export class ExpenseService {
   }
 
   async update(id: string, updateExpenseDto: UpdateExpenseDto) {
-    //this.validatePaidByAmount(updateExpenseDto);
-    //await this.validateUsersInGroup(updateExpenseDto.groupId, this.getConcernedUserIds(updateExpenseDto));
+    this.validatePaidByAmount(updateExpenseDto);
+    if (!updateExpenseDto.groupId) {
+      throw new BadRequestException('groupId is required');
+    }
+    await this.validateUsersInGroup(updateExpenseDto.groupId, this.getConcernedUserIds(updateExpenseDto));
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 
