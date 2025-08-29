@@ -35,9 +35,6 @@ WORKDIR /usr/src/app
 
 COPY --from=app_builder /usr/src/app/node_modules ./node_modules
 
-# Expose the application port
-EXPOSE 3000
-
 COPY --from=app_builder /usr/src/app/dist ./dist
 
 # Command to run the application
