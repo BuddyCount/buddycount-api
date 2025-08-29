@@ -29,12 +29,12 @@ describe('ExpenseController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('findAll', () => {
-    it('should return an array of expenses', async () => {
-      const result = [new Expense(), new Expense()];
-      jest.spyOn(service, 'findAll').mockImplementation(() => Promise.resolve(result));
+  describe('findOne', () => {
+    it('should return an expense', async () => {
+      const result = new Expense();
+      jest.spyOn(service, 'findOne').mockImplementation(() => Promise.resolve(result));
 
-      expect(await controller.findAll()).toBe(result);
+      expect(await controller.findOne('1')).toBe(result);
     });
   });
 });
