@@ -33,10 +33,25 @@ export class ExpenseService {
     }
   }
 
-  // TODO : need co add the groupId to the createExpenseDto
-  async create(createExpenseDto: CreateExpenseDto) {
-    await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
-    const expense = this.expenseRepository.create(createExpenseDto);
+  // TODO : same issue with updateExpenseDto
+  private validatePaidByAmount(expenseDto: CreateExpenseDto /*| UpdateExpenseDto*/) {
+    if (expenseDto.paidBy?.repartitionType === "AMOUNT") {
+      const total = expenseDto.paidBy.repartition
+        .map((r: any) => Number(r.values?.amount) || 0)
+        .reduce((a, b) => a + b, 0);
+      if (total !== expenseDto.amount) {
+        throw new BadRequestException(
+          `Sum of paidBy repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
+        );
+      }
+    }
+  }
+
+  // TODO : need to add the groupId to the createExpenseDto
+  async create(expenseDto: CreateExpenseDto /*| UpdateExpenseDto3*/) {
+    this.validatePaidByAmount(expenseDto);
+    await this.validateUsersInGroup(expenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
+    const expense = this.expenseRepository.create(expenseDto);
     return this.expenseRepository.save(expense);
   }
 
@@ -49,6 +64,7 @@ export class ExpenseService {
   }
 
   async update(id: string, updateExpenseDto: UpdateExpenseDto) {
+    //this.validatePaidByAmount(updateExpenseDto);
     //await this.validateUsersInGroup(updateExpenseDto.groupId, this.getConcernedUserIds(updateExpenseDto));
     return this.expenseRepository.update(id, updateExpenseDto);
   }
