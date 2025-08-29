@@ -22,6 +22,16 @@ export class GroupService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
+  async getGroupMemberIds(groupId: string): Promise<string[]> {
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+    });
+    if (!group || !group.users) {
+      return [];
+    }
+    return group.users.map((user: { id: string }) => user.id);
+  }
+
   update(id: string, updateGroupDto: UpdateGroupDto) {
     return this.groupRepository.update(id, updateGroupDto);
   }
