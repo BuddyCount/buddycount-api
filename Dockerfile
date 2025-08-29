@@ -1,6 +1,8 @@
 # Use the official Node.js image as the base image
 FROM node:lts-slim
 
+ENV NODE_ENV=production
+
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
