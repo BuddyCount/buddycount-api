@@ -17,6 +17,7 @@ describe('GroupExpenseController', () => {
         useValue: {
           findOne: jest.fn(),
         },
+
       }
       ,{
         provide: GroupService,
@@ -25,6 +26,8 @@ describe('GroupExpenseController', () => {
         },
       }
     ],
+      }],
+
     }).compile();
 
     controller = module.get<GroupExpenseController>(GroupExpenseController);
