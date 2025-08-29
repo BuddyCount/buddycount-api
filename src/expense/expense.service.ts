@@ -47,11 +47,10 @@ export class ExpenseService {
     }
   }
 
-  // TODO : need to add the groupId to the createExpenseDto
-  async create(expenseDto: CreateExpenseDto /*| UpdateExpenseDto3*/) {
-    this.validatePaidByAmount(expenseDto);
-    await this.validateUsersInGroup(expenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
-    const expense = this.expenseRepository.create(expenseDto);
+  async create(createExpenseDto: CreateExpenseDto) {
+    this.validatePaidByAmount(createExpenseDto);
+    await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
+    const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
   }
 
