@@ -56,6 +56,10 @@ jobs:
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          ## Only keep the pr tag not the sha tag, and only use the latest tag for the main branch
+          tags: |
+            type=ref,event=pr
+            type=raw,value=latest,enable={{is_default_branch}}
 
     - name: downcase IMAGE_NAME
       run: |
@@ -68,9 +72,7 @@ jobs:
         context: .
         target: image_builder # Only push the image_builder stage
         push: true
-        tags: |
-          ${{ steps.meta.outputs.tags }}
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Generate artifact attestation
