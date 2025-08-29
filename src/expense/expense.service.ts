@@ -17,13 +17,13 @@ export class ExpenseService {
     private readonly groupService: GroupService,
   ) { }
 
-  private getConcernedUserIds(expenseDto: CreateExpenseDto | UpdateExpenseDto): string[] {
-    const paidByIds = expenseDto.paidBy?.repartition?.map((r: any) => String(r.userId)) || [];
-    const paidForIds = expenseDto.paidFor?.repartition?.map((r: any) => String(r.userId)) || [];
+  private getConcernedUserIds(expenseDto: CreateExpenseDto | UpdateExpenseDto): number[] {
+    const paidByIds = expenseDto.paidBy?.repartition?.map((r: any) => r.userId) || [];
+    const paidForIds = expenseDto.paidFor?.repartition?.map((r: any) => r.userId) || [];
     return Array.from(new Set([...paidByIds, ...paidForIds]));
   }
 
-  private async validateUsersInGroup(groupId: string, userIds: string[]) {
+  private async validateUsersInGroup(groupId: string, userIds: number[]) {
     const groupMembers = await this.groupService.getGroupMemberIds(groupId);
     const invalidUsers = userIds.filter(uid => !groupMembers.includes(uid));
     if (invalidUsers.length > 0) {
@@ -55,11 +55,11 @@ export class ExpenseService {
     return this.expenseRepository.find();
   }
 
-  findOne(id: string) {
+  findOne(id: number) {
     return this.expenseRepository.findOne({ where: { id } });
   }
 
-  async update(id: string, updateExpenseDto: UpdateExpenseDto) {
+  async update(id: number, updateExpenseDto: UpdateExpenseDto) {
     this.validatePaidByAmount(updateExpenseDto);
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
@@ -68,7 +68,7 @@ export class ExpenseService {
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 
-  remove(id: string) {
+  remove(id: number) {
     return this.expenseRepository.delete(id);
   }
 }

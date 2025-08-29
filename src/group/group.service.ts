@@ -22,14 +22,14 @@ export class GroupService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
-  async getGroupMemberIds(groupId: string): Promise<string[]> {
+  async getGroupMemberIds(id: string): Promise<Number[]> {
     const group = await this.groupRepository.findOne({
-      where: { id: groupId },
+      where: { id: id },
     });
     if (!group || !group.users) {
       return [];
     }
-    return group.users.map((user: { id: string }) => user.id);
+    return group.users.map((user: any) => user.id);
   }
 
   update(id: string, updateGroupDto: UpdateGroupDto) {
