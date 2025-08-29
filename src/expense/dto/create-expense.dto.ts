@@ -1,5 +1,36 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Currency, ExpenseCategory, PaidDetails } from 'src/utils/types';
+
+let paidByExample: PaidDetails = {
+    repartitionType: "AMOUNT",
+    repartition: [
+        {
+            userId: 1,
+            values: {
+                amount: 100,
+            },
+        },
+    ],
+}
+
+let paidForExample: PaidDetails = {
+    repartitionType: "PORTIONS",
+    repartition: [
+        {
+            userId: 1,
+            values: {
+                share: 1,
+            },
+        },
+        {
+            userId: 2,
+            values: {
+                share: 1,
+            },
+        },
+    ],
+}
 
 export class CreateExpenseDto {
     @IsString()
@@ -10,4 +41,46 @@ export class CreateExpenseDto {
         example: 'Groceries',
     })
     name: string;
+
+    @ApiProperty({
+        description: 'The category of the expense',
+        example: ExpenseCategory.FOOD,
+    })
+    category: ExpenseCategory;
+
+    @ApiProperty({
+        description: 'The currency of the expense',
+        example: Currency.CHF,
+    })
+    currency: Currency;
+
+    @ApiProperty({
+        description: 'The exchange rate of the currency used for the expense (From currency of expense to currency of group)',
+        example: 0.9363,
+    })
+    exchange_rate: number;
+
+    @ApiProperty({
+        description: 'The date of the expense',
+        example: '2025-08-28',
+    })
+    date: Date;
+
+    @ApiProperty({
+        description: 'Amount in the currency of the expense',
+        example: 100,
+    })
+    amount: number;
+
+    @ApiProperty({
+        description: 'The paid by details',
+        example: paidByExample,
+    })
+    paidBy: PaidDetails;
+
+    @ApiProperty({
+        description: 'The paid for details',
+        example: paidForExample,
+    })
+    paidFor: PaidDetails;
 }

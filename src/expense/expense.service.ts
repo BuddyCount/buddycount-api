@@ -23,14 +23,14 @@ export class ExpenseService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} expense`;
+    return this.expenseRepository.findOne({ where: { id } });
   }
 
   update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    return `This action updates a #${id} expense`;
+    return this.expenseRepository.update(id, updateExpenseDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} expense`;
+    return this.expenseRepository.delete(id);
   }
 }

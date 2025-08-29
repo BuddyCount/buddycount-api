@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExpenseModule } from './expense/expense.module';
 import { join } from 'path';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { join } from 'path';
       // logging: true,
     }),
     ExpenseModule,
+    GroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

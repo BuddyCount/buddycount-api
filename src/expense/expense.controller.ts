@@ -5,13 +5,14 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Controller('expense')
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(private readonly expenseService: ExpenseService) { }
 
   @Post()
   create(@Body() createExpenseDto: CreateExpenseDto) {
     return this.expenseService.create(createExpenseDto);
   }
 
+  // TODO: remove or edit this, no one should be able to access all expenses at once, only all expenses of a group
   @Get()
   findAll() {
     return this.expenseService.findAll();
