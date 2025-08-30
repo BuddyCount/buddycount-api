@@ -26,7 +26,7 @@ export type UserShare = {
     }
 }
 
-export type PaidDetails = {
+export class PaidDetails {
     repartitionType: 'PORTIONS' | 'AMOUNT';
     repartition: UserShare[];
 }

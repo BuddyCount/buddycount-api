@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Currency, ExpenseCategory, PaidDetails } from 'src/utils/types';
+import { Type } from 'class-transformer';
 
 let paidByExample: PaidDetails = {
     repartitionType: "AMOUNT",
@@ -33,58 +34,76 @@ let paidForExample: PaidDetails = {
 }
 
 export class CreateExpenseDto {
-
+    @IsNotEmpty()
+    @IsUUID(4)
     @ApiProperty({
         description: 'The id of the group',
         example: '2f9ace4b-9698-403e-b573-11ed9a3f22e0',
     })
     groupId: string;
 
-    @IsString()
     @IsNotEmpty()
-    @Length(1, 30)
+    @IsString()
+    @MaxLength(30)
     @ApiProperty({
         description: 'The name of the expense',
         example: 'Groceries',
     })
     name: string;
 
+    @IsNotEmpty()
+    @IsEnum(ExpenseCategory)
     @ApiProperty({
         description: 'The category of the expense',
         example: ExpenseCategory.FOOD,
     })
     category: ExpenseCategory;
 
+    @IsNotEmpty()
+    @IsEnum(Currency)
     @ApiProperty({
         description: 'The currency of the expense',
         example: Currency.CHF,
     })
     currency: Currency;
 
+    @IsNotEmpty()
+    @IsNumber({ allowNaN: false, allowInfinity: false })
+    @IsPositive()
     @ApiProperty({
         description: 'The exchange rate of the currency used for the expense (From currency of expense to currency of group)',
         example: 0.9363,
     })
     exchange_rate: number;
 
+    @IsNotEmpty()
+    @IsDateString()
     @ApiProperty({
         description: 'The date of the expense',
         example: '2025-08-28',
     })
     date: Date;
 
+    @IsNotEmpty()
+    @IsNumber({ allowNaN: false, allowInfinity: false })
     @ApiProperty({
         description: 'Amount in the currency of the expense',
         example: 100,
     })
     amount: number;
 
+    @Type(() => PaidDetails)
+    @IsNotEmpty()
+    @ValidateNested()
     @ApiProperty({
         description: 'The paid by details',
         example: paidByExample,
     })
     paidBy: PaidDetails;
 
+    @Type(() => PaidDetails)
+    @IsNotEmpty()
+    @ValidateNested()
     @ApiProperty({
         description: 'The paid for details',
         example: paidForExample,
