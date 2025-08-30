@@ -3,6 +3,8 @@ import { ExpenseController } from './expense.controller';
 import { ExpenseService } from './expense.service';
 import { Expense } from './entities/expense.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { GroupService } from '../group/group.service';
+
 
 describe('ExpenseController', () => {
   let controller: ExpenseController;
@@ -18,7 +20,14 @@ describe('ExpenseController', () => {
           // save: jest.fn(),
           findAll: jest.fn(),
         },
-      }],
+      }
+      , {
+        provide: GroupService,
+        useValue: {
+          getGroupMemberIds: jest.fn().mockResolvedValue([1, 2]), // mock method
+        },
+      }
+    ],
     }).compile();
 
     controller = module.get<ExpenseController>(ExpenseController);

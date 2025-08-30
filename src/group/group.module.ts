@@ -13,5 +13,6 @@ import { ExpenseModule } from 'src/expense/expense.module';
   ],
   controllers: [GroupController, GroupExpenseController],
   providers: [GroupService],
+  exports: [GroupService],
 })
 export class GroupModule { }
