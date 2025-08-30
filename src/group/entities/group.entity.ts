@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, Generated, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from "typeorm";
-import { Currency, UserIndex } from "src/utils/types";
+import { Currency } from "src/utils/types";
 import { Expense } from "src/expense/entities/expense.entity";
+import { UserIndexDto } from "../dto/create-group.dto";
 
 @Entity()
 export class Group {
@@ -21,7 +22,7 @@ export class Group {
     currency: Currency;
 
     @Column("simple-json")
-    users: UserIndex[];
+    users: UserIndexDto[];
 
     /* Metadata, auto-generated */
     @CreateDateColumn()

@@ -1,7 +1,25 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsEnum, IsNotEmpty, IsString, MaxLength, ValidateNested } from "class-validator";
-import { Currency, UserIndex } from "src/utils/types";
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, MaxLength, ValidateNested } from "class-validator";
+import { Currency } from "src/utils/types";
 import { Type } from "class-transformer";
+
+export class UserIndexDto {
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty({
+        description: 'The id of the user',
+        example: 1,
+    })
+    id: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({
+        description: 'The name of the user',
+        example: 'John Doe',
+    })
+    name: string;
+}
 
 export class CreateGroupDto {
     @IsNotEmpty()
@@ -32,11 +50,11 @@ export class CreateGroupDto {
 
     @IsNotEmpty()
     @IsArray()
-    @Type(() => UserIndex)
+    @Type(() => UserIndexDto)
     @ValidateNested({ each: true })
     @ApiProperty({
         description: 'The users of the group',
         example: [{ id: 1, name: 'John Doe' }],
     })
-    users: UserIndex[];
+    users: UserIndexDto[];
 }

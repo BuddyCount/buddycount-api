@@ -1,10 +1,65 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Currency, ExpenseCategory, PaidDetails } from 'src/utils/types';
+import { Currency, ExpenseCategory, RepartitionType } from 'src/utils/types';
 import { Type } from 'class-transformer';
 
-let paidByExample: PaidDetails = {
-    repartitionType: "AMOUNT",
+export class UserShareValuesDto {
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty({
+        description: 'The amount of the user share. Only used for AMOUNT.',
+        example: 100,
+    })
+    amount?: number; // only used for AMOUNT
+
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty({
+        description: 'The share of the user share. Only used for PORTIONS.',
+        example: 1,
+    })
+    share?: number; // only used for PORTIONS
+}
+
+export class UserShareDto {
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty({
+        description: 'The id of the user',
+        example: 1,
+    })
+    userId: number;
+
+    @IsNotEmpty()
+    @ApiProperty({
+        description: 'The values of the user share',
+        example: { amount: 100, share: 1 },
+    })
+    values: UserShareValuesDto;
+}
+
+export class PaidDetailsDto {
+    @IsNotEmpty()
+    @IsEnum(RepartitionType)
+    @ApiProperty({
+        description: 'The repartition type',
+        example: RepartitionType.AMOUNT,
+    })
+    repartitionType: RepartitionType;
+
+    @IsNotEmpty()
+    @IsArray()
+    @Type(() => UserShareDto)
+    @ValidateNested({ each: true })
+    @ApiProperty({
+        description: 'The repartition',
+        example: [{ userId: 1, values: { amount: 100 } }],
+    })
+    repartition: UserShareDto[];
+}
+
+let paidByExample: PaidDetailsDto = {
+    repartitionType: RepartitionType.AMOUNT,
     repartition: [
         {
             userId: 1,
@@ -15,8 +70,8 @@ let paidByExample: PaidDetails = {
     ],
 }
 
-let paidForExample: PaidDetails = {
-    repartitionType: "PORTIONS",
+let paidForExample: PaidDetailsDto = {
+    repartitionType: RepartitionType.PORTIONS,
     repartition: [
         {
             userId: 1,
@@ -92,21 +147,21 @@ export class CreateExpenseDto {
     })
     amount: number;
 
-    @Type(() => PaidDetails)
     @IsNotEmpty()
+    @Type(() => PaidDetailsDto)
     @ValidateNested()
     @ApiProperty({
         description: 'The paid by details',
         example: paidByExample,
     })
-    paidBy: PaidDetails;
+    paidBy: PaidDetailsDto;
 
-    @Type(() => PaidDetails)
     @IsNotEmpty()
+    @Type(() => PaidDetailsDto)
     @ValidateNested()
     @ApiProperty({
         description: 'The paid for details',
         example: paidForExample,
     })
-    paidFor: PaidDetails;
+    paidFor: PaidDetailsDto;
 }
