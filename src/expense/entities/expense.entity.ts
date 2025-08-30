@@ -1,5 +1,6 @@
 import { Group } from 'src/group/entities/group.entity';
-import { Currency, ExpenseCategory, PaidDetails } from 'src/utils/types';
+import { Currency, ExpenseCategory } from 'src/utils/types';
+import { PaidDetailsDto } from '../dto/create-expense.dto';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
 @Entity()
@@ -28,10 +29,10 @@ export class Expense {
     amount: number;
 
     @Column('simple-json')
-    paidBy: PaidDetails;
+    paidBy: PaidDetailsDto;
 
     @Column('simple-json')
-    paidFor: PaidDetails;
+    paidFor: PaidDetailsDto;
 
     /* Metadata, auto-generated */
     @CreateDateColumn()
