@@ -50,6 +50,6 @@ export class Expense {
     groupId: string;
 
     // Group
-    @ManyToOne(() => Group, (group) => group.expenses)
+    @ManyToOne(() => Group, (group) => group.expenses, { onDelete: 'CASCADE' })
     group: Group;
 }
