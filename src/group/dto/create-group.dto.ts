@@ -54,7 +54,7 @@ export class CreateGroupDto {
     @ValidateNested({ each: true })
     @ApiProperty({
         description: 'The users of the group',
-        example: [{ id: 1, name: 'John Doe' }],
+        example: [{ id: 1, name: 'John Doe' }, { id: 2, name: 'Jane Doe' }],
     })
     users: UserIndexDto[];
 }
