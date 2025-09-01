@@ -31,70 +31,69 @@ export class ExpenseService {
     }
   }
 
-  private validatePaidByAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
-    if (expenseDto.paidBy?.repartitionType === "AMOUNT") {
-      const total = expenseDto.paidBy.repartition
+  private vaildateAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto, expense : 'paidBy' | 'paidFor') {
+    if (expenseDto[expense]?.repartition) {
+      const total = expenseDto[expense].repartition
         .map((r: any) => Number(r.values?.amount) || 0)
         .reduce((a, b) => a + b, 0);
       if (total !== expenseDto.amount) {
         throw new BadRequestException(
-          `Sum of paidBy repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
+          `Sum of ${expense} repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
         );
       }
-    }
-    else if (expenseDto.paidBy?.repartitionType === "PORTIONS") {
-      const invalidShares = expenseDto.paidBy.repartition
-        .map((r: any) => Number(r.values?.share) || 0)
-        .filter((share: number) => share < 0);
-      if (invalidShares.length > 0) {
-        throw new BadRequestException(
-          `Shares in paidBy repartition must be non-negative numbers`
-        );
-      }
-      const totalShares = expenseDto.paidBy.repartition
-        .map((r: any) => Number(r.values?.share) || 0)
-        .reduce((a, b) => a + b, 0);
-      if (totalShares < 1) {
-        throw new BadRequestException(
-          `Total shares in paidBy repartition must be greater or eaqual to one`
-        );
-      }
+    } else {
+      throw new BadRequestException(
+        `${expense} repartition is required`
+      );
     }
   }
 
-  private validatePaidForAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
-    if (expenseDto.paidFor?.repartitionType === "AMOUNT") {
-      const total = expenseDto.paidFor.repartition
-        .map((r: any) => Number(r.values?.amount) || 0)
-        .reduce((a, b) => a + b, 0);
-      if (total !== expenseDto.amount) {
-        throw new BadRequestException(
-          `Sum of paidFor repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
-        );
-      }
-    } else if (expenseDto.paidFor?.repartitionType === "PORTIONS") {
-      const invalidShares = expenseDto.paidFor.repartition
+  private validatePortions(expenseDto: CreateExpenseDto | UpdateExpenseDto, expense: 'paidBy' | 'paidFor') {
+    if (expense === 'paidBy') {
+      throw new BadRequestException(
+        `Repartition type "PORTIONS" is not allowed for paidBy`
+      );
+    }
+    if (expenseDto[expense]?.repartition && expense === "paidFor") {
+      const invalidShares = expenseDto[expense]?.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .filter((share: number) => share < 0);
       if (invalidShares.length > 0) {
         throw new BadRequestException(
-          `Shares in paidFor repartition must be non-negative numbers`
+          `Shares in ${expense} repartition must be non-negative numbers`
         );
       }
-      const totalShares = expenseDto.paidFor.repartition
+      const totalShares = expenseDto[expense]?.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
       if (totalShares < 1) {
         throw new BadRequestException(
-          `Total shares in paidFor repartition must be greater or eaqual to one`
+          `Total shares in ${expense} repartition must be greater or equal to one`
         );
       }
+    } else  {
+      throw new BadRequestException(
+        `${expense} repartition is required`
+      );
     }
   }
+
+  private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto, expense: 'paidBy' | 'paidFor') {
+    if(expenseDto[expense]?.repartitionType === "AMOUNT") {
+      this.vaildateAmount(expenseDto, expense);
+    } else if (expenseDto[expense]?.repartitionType === "PORTIONS") {
+      this.validatePortions(expenseDto, expense);
+    } else {
+      throw new BadRequestException(
+        `Repartition type "${expenseDto[expense]?.repartitionType}" is not allowed for ${expense}`
+      );
+    }
+  }
+  
 
   async create(createExpenseDto: CreateExpenseDto) {
-    this.validatePaidByAmount(createExpenseDto);
-    this.validatePaidForAmount(createExpenseDto);
+    this.validatePaid(createExpenseDto, 'paidBy');
+    this.validatePaid(createExpenseDto, 'paidFor');
     await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
     const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
@@ -109,8 +108,8 @@ export class ExpenseService {
   }
 
   async update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    this.validatePaidByAmount(updateExpenseDto);
-    this.validatePaidForAmount(updateExpenseDto);
+    this.validatePaid(updateExpenseDto, 'paidBy');
+    this.validatePaid(updateExpenseDto, 'paidFor');
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
