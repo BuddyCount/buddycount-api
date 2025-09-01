@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseFilePipe, UploadedFile } from '@nestjs/common';
 import { MaxFileSizeValidator } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
+import { MAX_IMAGE_SIZE } from 'src/utils/constants';
 
 @Controller('image')
 export class ImageController {
@@ -33,7 +34,7 @@ export class ImageController {
   uploadFile(@UploadedFile(
     new ParseFilePipe({
       validators: [
-        new MaxFileSizeValidator({ maxSize: 100000 }),
+        new MaxFileSizeValidator({ maxSize: MAX_IMAGE_SIZE }),
       ]
     })
   ) file: Express.Multer.File) {
