@@ -5,12 +5,14 @@ import { AppService } from './app.service';
 import { ExpenseModule } from './expense/expense.module';
 import { dataSourceOptions } from './config/database/data-source';
 import { GroupModule } from './group/group.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
     ExpenseModule,
     GroupModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
