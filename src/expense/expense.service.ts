@@ -42,6 +42,16 @@ export class ExpenseService {
         );
       }
     }
+    else if (expenseDto.paidBy?.repartitionType === "PORTIONS") {
+      const totalShares = expenseDto.paidBy.repartition
+        .map((r: any) => Number(r.values?.share) || 0)
+        .reduce((a, b) => a + b, 0);
+      if (totalShares <= 0) {
+        throw new BadRequestException(
+          `Total shares in paidBy repartition must be greater than zero`
+        );
+      }
+    }
   }
 
   private validatePaidForAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
@@ -52,6 +62,15 @@ export class ExpenseService {
       if (total !== expenseDto.amount) {
         throw new BadRequestException(
           `Sum of paidFor repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
+        );
+      }
+    } else if (expenseDto.paidFor?.repartitionType === "PORTIONS") {
+      const totalShares = expenseDto.paidFor.repartition
+        .map((r: any) => Number(r.values?.share) || 0)
+        .reduce((a, b) => a + b, 0);
+      if (totalShares <= 0) {
+        throw new BadRequestException(
+          `Total shares in paidFor repartition must be greater than zero`
         );
       }
     }
