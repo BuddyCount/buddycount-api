@@ -43,6 +43,14 @@ export class ExpenseService {
       }
     }
     else if (expenseDto.paidBy?.repartitionType === "PORTIONS") {
+      const invalidShares = expenseDto.paidBy.repartition
+        .map((r: any) => Number(r.values?.share) || 0)
+        .filter((share: number) => share < 0);
+      if (invalidShares.length > 0) {
+        throw new BadRequestException(
+          `Shares in paidBy repartition must be non-negative numbers`
+        );
+      }
       const totalShares = expenseDto.paidBy.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
@@ -65,6 +73,14 @@ export class ExpenseService {
         );
       }
     } else if (expenseDto.paidFor?.repartitionType === "PORTIONS") {
+      const invalidShares = expenseDto.paidFor.repartition
+        .map((r: any) => Number(r.values?.share) || 0)
+        .filter((share: number) => share < 0);
+      if (invalidShares.length > 0) {
+        throw new BadRequestException(
+          `Shares in paidFor repartition must be non-negative numbers`
+        );
+      }
       const totalShares = expenseDto.paidFor.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
