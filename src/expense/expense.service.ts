@@ -120,9 +120,9 @@ export class ExpenseService {
     // TODO: maybe securise this, now anyone can access any link
     if (createExpenseDto.images) {
       try {
-        createExpenseDto.images.forEach(async (image) => {
-          await this.imageService.getImage(image);
-        });
+        await Promise.all(
+          createExpenseDto.images.map(image => this.imageService.getImage(image))
+        );
       } catch (error) {
         throw new BadRequestException('Image not found');
       }
