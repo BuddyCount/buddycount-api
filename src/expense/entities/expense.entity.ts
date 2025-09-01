@@ -44,7 +44,7 @@ export class Expense {
     @VersionColumn()
     version: number;
 
-    @Column({ type: 'simple-array' })
+    @Column({ type: 'simple-array', nullable: true })
     images: string[];
 
     /* Relations */
