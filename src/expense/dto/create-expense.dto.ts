@@ -164,4 +164,10 @@ export class CreateExpenseDto {
         example: paidForExample,
     })
     paidFor: PaidDetailsDto;
+
+    @ApiProperty({
+        description: 'The images of the expense, if any',
+        example: ['image1.jpg', 'image2.jpg'],
+    })
+    images: string[];
 }

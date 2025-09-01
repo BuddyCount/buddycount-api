@@ -44,6 +44,9 @@ export class Expense {
     @VersionColumn()
     version: number;
 
+    @Column({ type: 'simple-array' })
+    images: string[];
+
     /* Relations */
 
     @Column({ type: 'uuid' })
