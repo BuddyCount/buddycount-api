@@ -54,9 +54,9 @@ export class ExpenseService {
       const totalShares = expenseDto.paidBy.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
-      if (totalShares <= 0) {
+      if (totalShares < 1) {
         throw new BadRequestException(
-          `Total shares in paidBy repartition must be greater than zero`
+          `Total shares in paidBy repartition must be greater or eaqual to one`
         );
       }
     }
@@ -84,9 +84,9 @@ export class ExpenseService {
       const totalShares = expenseDto.paidFor.repartition
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
-      if (totalShares <= 0) {
+      if (totalShares < 1) {
         throw new BadRequestException(
-          `Total shares in paidFor repartition must be greater than zero`
+          `Total shares in paidFor repartition must be greater or eaqual to one`
         );
       }
     }
