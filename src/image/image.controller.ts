@@ -4,7 +4,6 @@ import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseFilePipe, UploadedFile } from '@nestjs/common';
 import { MaxFileSizeValidator } from '@nestjs/common';
-import { FileTypeValidator } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
 
 @Controller('image')
@@ -35,7 +34,6 @@ export class ImageController {
     new ParseFilePipe({
       validators: [
         new MaxFileSizeValidator({ maxSize: 100000 }),
-        new FileTypeValidator({ fileType: 'image/jpeg' })
       ]
     })
   ) file: Express.Multer.File) {
