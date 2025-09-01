@@ -12,21 +12,7 @@ export enum ExpenseCategory {
     OTHER = 'OTHER',
 }
 
-
-export type UserIndex = {
-    id: number;
-    name: string;
-}
-
-export type UserShare = {
-    userId: number;
-    values: {
-        amount?: number; // only used for AMOUNT
-        share?: number; // only used for PORTIONS
-    }
-}
-
-export type PaidDetails = {
-    repartitionType: 'PORTIONS' | 'AMOUNT';
-    repartition: UserShare[];
+export enum RepartitionType {
+    PORTIONS = 'PORTIONS',
+    AMOUNT = 'AMOUNT',
 }
