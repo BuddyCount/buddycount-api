@@ -44,8 +44,22 @@ export class ExpenseService {
     }
   }
 
+  private validatePaidForAmount(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
+    if (expenseDto.paidFor?.repartitionType === "AMOUNT") {
+      const total = expenseDto.paidFor.repartition
+        .map((r: any) => Number(r.values?.amount) || 0)
+        .reduce((a, b) => a + b, 0);
+      if (total !== expenseDto.amount) {
+        throw new BadRequestException(
+          `Sum of paidFor repartition amounts (${total}) does not match expense amount (${expenseDto.amount})`
+        );
+      }
+    }
+  }
+
   async create(createExpenseDto: CreateExpenseDto) {
     this.validatePaidByAmount(createExpenseDto);
+    this.validatePaidForAmount(createExpenseDto);
     await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
     const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
@@ -61,6 +75,7 @@ export class ExpenseService {
 
   async update(id: number, updateExpenseDto: UpdateExpenseDto) {
     this.validatePaidByAmount(updateExpenseDto);
+    this.validatePaidForAmount(updateExpenseDto);
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
