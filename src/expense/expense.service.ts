@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateExpenseDto } from './dto/create-expense.dto';
+import { CreateExpenseDto, UserShareDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense } from './entities/expense.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupService } from '../group/group.service';
 import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
-import { UserShare } from 'src/utils/types';
 
 @Injectable()
 export class ExpenseService {
@@ -32,7 +31,7 @@ export class ExpenseService {
     }
   }
 
-  private vaildateAmount(userShare: UserShare[], expense : 'paidBy' | 'paidFor', amount?: number) {
+  private vaildateAmount(userShare: UserShareDto[], expense : 'paidBy' | 'paidFor', amount?: number) {
     if (userShare !== undefined && userShare !== null) {
       const total = userShare
         .map((r: any) => Number(r.values?.amount) || 0)
@@ -49,7 +48,7 @@ export class ExpenseService {
     }
   }
 
-  private validatePortions(userShare: UserShare[], expense: 'paidBy' | 'paidFor') {
+  private validatePortions(userShare: UserShareDto[], expense: 'paidBy' | 'paidFor') {
     if (expense === 'paidBy') {
       throw new BadRequestException(
         `Repartition type "PORTIONS" is not allowed for paidBy`
