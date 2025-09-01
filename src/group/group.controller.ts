@@ -32,4 +32,9 @@ export class GroupController {
   remove(@Param('id') id: string) {
     return this.groupService.remove(id);
   }
+
+  @Get('join/:linkToken')
+  join(@Param('linkToken') linkToken: string) {
+    return this.groupService.join(linkToken);
+  }
 }
