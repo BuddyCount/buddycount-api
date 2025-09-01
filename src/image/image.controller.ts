@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -38,10 +38,11 @@ export class ImageController {
       ]
     })
   ) file: Express.Multer.File) {
-    console.log(file);
+
     if (file == undefined) {
-      throw new Error('File not found');
+      throw new BadRequestException('File not found');
     }
+
     return { filename: file.filename }
   }
 
