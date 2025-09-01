@@ -39,4 +39,9 @@ export class GroupService {
   remove(id: string) {
     return this.groupRepository.delete(id);
   }
+
+  join(linkToken: string) {
+    // TODO: check auth
+    return this.groupRepository.findOne({ where: { linkToken }, select: ['id'] });
+  }
 }
