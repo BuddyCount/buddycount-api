@@ -31,7 +31,7 @@ export class ExpenseService {
     }
   }
 
-  private vaildateAmount(userShare: UserShareDto[], expense : 'paidBy' | 'paidFor', amount?: number) {
+  private vaildateAmount(userShare: UserShareDto[], expense: 'paidBy' | 'paidFor', amount?: number) {
     if (userShare !== undefined && userShare !== null) {
       const total = userShare
         .map((r: any) => Number(r.values?.amount) || 0)
@@ -54,11 +54,13 @@ export class ExpenseService {
         `Repartition type "PORTIONS" is not allowed for paidBy`
       );
     }
+
     if (userShare === undefined || userShare === null) {
       throw new BadRequestException(
         `${expense} repartition is required`
       );
     }
+
     if (expense === "paidFor") {
       const invalidShares = userShare
         .map((r: any) => Number(r.values?.share) || 0)
@@ -68,6 +70,7 @@ export class ExpenseService {
           `Shares in ${expense} repartition must be non-negative numbers`
         );
       }
+
       const totalShares = userShare
         .map((r: any) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
@@ -80,8 +83,9 @@ export class ExpenseService {
   }
 
   private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
-    if(expenseDto.paidBy?.repartitionType === "AMOUNT") {
-      this.vaildateAmount(expenseDto.paidBy?.repartition,'paidBy', expenseDto.amount);
+    // Check paidBy
+    if (expenseDto.paidBy?.repartitionType === "AMOUNT") {
+      this.vaildateAmount(expenseDto.paidBy?.repartition, 'paidBy', expenseDto.amount);
     } else if (expenseDto.paidBy?.repartitionType === "PORTIONS") {
       this.validatePortions(expenseDto.paidBy?.repartition, 'paidBy');
     } else {
@@ -89,23 +93,27 @@ export class ExpenseService {
         `Repartition type "${expenseDto.paidBy?.repartitionType}" is not allowed for paidBy`
       );
     }
-     if(expenseDto.paidFor?.repartitionType === "AMOUNT") {
-      this.vaildateAmount(expenseDto.paidFor?.repartition,'paidFor', expenseDto.amount);
+
+    // Check paidFor
+    if (expenseDto.paidFor?.repartitionType === "AMOUNT") {
+      this.vaildateAmount(expenseDto.paidFor?.repartition, 'paidFor', expenseDto.amount);
     } else if (expenseDto.paidFor?.repartitionType === "PORTIONS") {
       this.validatePortions(expenseDto.paidFor?.repartition, 'paidFor');
     } else {
       throw new BadRequestException(
         `Invalid repartition type "${expenseDto.paidFor?.repartitionType}" for paidFor`
       );
-     }
+    }
   }
 
   async create(createExpenseDto: CreateExpenseDto) {
     if (!createExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
+
     await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
     this.validatePaid(createExpenseDto);
+
     const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
   }
