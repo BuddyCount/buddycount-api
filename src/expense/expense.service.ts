@@ -38,6 +38,27 @@ export class ExpenseService {
     }
   }
 
+  private validateUserShareValues(
+    userShare: UserShareDto[],
+    expense: 'paidBy' | 'paidFor',
+  ) {
+    if (!userShare) return;
+
+    userShare.forEach((r) => {
+      const values = r.values;
+      if (
+        !values?.amount &&
+        values?.amount !== 0 &&
+        !values?.share &&
+        values?.share !== 0
+      ) {
+        throw new BadRequestException(
+          `Each user in ${expense} repartition must have either "amount" or "share" defined`,
+        );
+      }
+    });
+  }
+
   private vaildateAmount(
     userShare: UserShareDto[],
     expense: 'paidBy' | 'paidFor',
@@ -94,6 +115,10 @@ export class ExpenseService {
 
   private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
     // Check paidBy
+    this.validateUserShareValues(
+      expenseDto.paidBy?.repartition as any,
+      'paidBy',
+    );
     if (expenseDto.paidBy?.repartitionType === 'AMOUNT') {
       this.vaildateAmount(
         expenseDto.paidBy?.repartition,
@@ -109,6 +134,10 @@ export class ExpenseService {
     }
 
     // Check paidFor
+    this.validateUserShareValues(
+      expenseDto.paidFor?.repartition as any,
+      'paidFor',
+    );
     if (expenseDto.paidFor?.repartitionType === 'AMOUNT') {
       this.vaildateAmount(
         expenseDto.paidFor?.repartition,

@@ -147,6 +147,25 @@ describe('ExpenseService', () => {
       );
     });
 
+    it('should throw if a UserShareDto has neither amount nor share defined', async () => {
+      const dto = {
+        groupId: '1',
+        amount: 100,
+        paidBy: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: {} }], // missing amount
+        },
+        paidFor: {
+          repartitionType: 'PORTIONS',
+          repartition: [{ userId: 1, values: {} }], // missing share
+        },
+      } as any;
+
+      (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
+
+      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+    });
+
     // ----------------- VALIDATE PAID EDGE CASES -----------------
     it('should throw if paidBy repartitionType is PORTIONS', async () => {
       const dto = {
