@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
+@ApiTags('Expenses')
+@UseGuards(AuthGuard('jwt')) 
 @Controller('expense')
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) { }
+  constructor(private readonly expenseService: ExpenseService) {}
 
-  // TODO: remove or edit this, no one should be able to access all expenses at once, only all expenses of a group
+  // TODO: remove or edit this, no one should be able to access all expenses at once
   // @Get()
   // findAll() {
   //   return this.expenseService.findAll();
