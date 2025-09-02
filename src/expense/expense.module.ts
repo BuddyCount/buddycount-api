@@ -12,4 +12,4 @@ import { ImageModule } from 'src/image/image.module';
   providers: [ExpenseService],
   exports: [ExpenseService],
 })
-export class ExpenseModule { }
+export class ExpenseModule {}

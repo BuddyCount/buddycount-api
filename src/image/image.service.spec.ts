@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImageService } from './image.service';
-import { BadRequestException, NotFoundException, StreamableFile } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  StreamableFile,
+} from '@nestjs/common';
 import { existsSync, createReadStream } from 'fs';
 import { join } from 'path';
 
@@ -62,7 +66,9 @@ describe('ImageService', () => {
 
     it('should throw BadRequestException if filename is unsafe', () => {
       const filename = '../file.jpg';
-      const isSafeSpy = jest.spyOn(service as any, 'isSafeFilename').mockReturnValue(false);
+      const isSafeSpy = jest
+        .spyOn(service as any, 'isSafeFilename')
+        .mockReturnValue(false);
 
       expect(() => service.getImage(filename)).toThrow(BadRequestException);
       expect(isSafeSpy).toHaveBeenCalledWith(filename);
@@ -71,15 +77,25 @@ describe('ImageService', () => {
 
   describe('isSafeFilename', () => {
     it('should allow valid filenames', () => {
-      const filenames = ['test.jpg', 'file-1.png', 'my_file.txt', 'a.b_c-123.jpeg'];
-      filenames.forEach(name => {
+      const filenames = [
+        'test.jpg',
+        'file-1.png',
+        'my_file.txt',
+        'a.b_c-123.jpeg',
+      ];
+      filenames.forEach((name) => {
         expect((service as any).isSafeFilename(name)).toBe(true);
       });
     });
 
     it('should reject unsafe filenames', () => {
-      const filenames = ['../file.jpg', '/etc/passwd', 'file\\name.jpg', 'file/name.png'];
-      filenames.forEach(name => {
+      const filenames = [
+        '../file.jpg',
+        '/etc/passwd',
+        'file\\name.jpg',
+        'file/name.png',
+      ];
+      filenames.forEach((name) => {
         expect((service as any).isSafeFilename(name)).toBe(false);
       });
     });

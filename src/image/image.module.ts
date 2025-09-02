@@ -5,7 +5,6 @@ import { diskStorage } from 'multer';
 import { MulterModule } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 
-
 @Module({
   imports: [
     MulterModule.register({
@@ -21,7 +20,10 @@ import { v4 as uuidv4 } from 'uuid';
         if (file.mimetype.startsWith('image/')) {
           cb(null, true);
         } else {
-          cb(new BadRequestException('Invalid file type, must be an image'), false);
+          cb(
+            new BadRequestException('Invalid file type, must be an image'),
+            false,
+          );
         }
       },
     }),
@@ -30,4 +32,4 @@ import { v4 as uuidv4 } from 'uuid';
   providers: [ImageService],
   exports: [ImageService],
 })
-export class ImageModule { }
+export class ImageModule {}

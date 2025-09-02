@@ -7,12 +7,9 @@ import { GroupExpenseController } from './group-expense/group-expense.controller
 import { ExpenseModule } from 'src/expense/expense.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Group]),
-    forwardRef(() => ExpenseModule),
-  ],
+  imports: [TypeOrmModule.forFeature([Group]), forwardRef(() => ExpenseModule)],
   controllers: [GroupController, GroupExpenseController],
   providers: [GroupService],
   exports: [GroupService],
 })
-export class GroupModule { }
+export class GroupModule {}
