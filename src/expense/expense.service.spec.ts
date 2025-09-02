@@ -78,6 +78,32 @@ describe('ExpenseService', () => {
       expect(result).toEqual({ id: 'exp1', ...baseDto });
     });
 
+    it('should create expense successfully with paidFor repartitionType PORTIONS', async () => {
+      const dto = {
+        groupId: '1',
+        amount: 100,
+        paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
+        paidFor: { repartitionType: 'PORTIONS', repartition: [
+          { userId: 1, values: { share: 1 } },
+          { userId: 2, values: { share: 1 } },
+        ] },
+        images: ['img1'],
+      } as any;
+
+      (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1, 2]);
+      (imageService.getImage as jest.Mock).mockResolvedValue({});
+      repo.create.mockReturnValue(dto as any);
+      repo.save.mockResolvedValue({ id: 'exp2', ...dto } as any);
+
+      const result = await service.create(dto);
+
+      expect(groupService.getGroupMemberIds).toHaveBeenCalledWith('1');
+      expect(imageService.getImage).toHaveBeenCalledWith('img1');
+      expect(repo.create).toHaveBeenCalledWith(dto);
+      expect(repo.save).toHaveBeenCalledWith(dto);
+      expect(result).toEqual({ id: 'exp2', ...dto });
+    });
+
     it('should throw if groupId missing', async () => {
       const dto = { amount: 100 } as any;
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);

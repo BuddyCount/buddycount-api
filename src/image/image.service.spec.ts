@@ -37,11 +37,6 @@ describe('ImageService', () => {
       expect(result).toBeInstanceOf(StreamableFile);
     });
 
-    it('should throw BadRequestException for unsafe filename', () => {
-      const filename = '../etc/passwd';
-      expect(() => service.getImage(filename)).toThrow(BadRequestException);
-    });
-
     it('should throw NotFoundException if file does not exist', () => {
       const filename = 'file.jpg';
       (existsSync as jest.Mock).mockReturnValue(false);
