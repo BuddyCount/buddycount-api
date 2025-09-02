@@ -21,7 +21,7 @@ export class GroupService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
-  async getGroupMemberIds(id: string): Promise<Number[]> {
+  async getGroupMemberIds(id: string): Promise<number[]> {
     const group = await this.groupRepository.findOne({
       where: { id: id },
     });

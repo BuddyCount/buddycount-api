@@ -70,7 +70,7 @@ export class PaidDetailsDto {
   repartition: UserShareDto[];
 }
 
-let paidByExample: PaidDetailsDto = {
+const paidByExample: PaidDetailsDto = {
   repartitionType: RepartitionType.AMOUNT,
   repartition: [
     {
@@ -82,7 +82,7 @@ let paidByExample: PaidDetailsDto = {
   ],
 };
 
-let paidForExample: PaidDetailsDto = {
+const paidForExample: PaidDetailsDto = {
   repartitionType: RepartitionType.PORTIONS,
   repartition: [
     {

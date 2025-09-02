@@ -104,8 +104,8 @@ describe('ExpenseService', () => {
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1, 2]);
       (imageService.getImage as jest.Mock).mockResolvedValue({});
-      repo.create.mockReturnValue(dto as any);
-      repo.save.mockResolvedValue({ id: 'exp2', ...dto } as any);
+      repo.create.mockReturnValue(dto);
+      repo.save.mockResolvedValue({ id: 'exp2', ...dto });
 
       const result = await service.create(dto);
 
