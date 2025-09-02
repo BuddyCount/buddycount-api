@@ -16,7 +16,7 @@ export class ExpenseService {
     @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
     private readonly imageService: ImageService,
-  ) {}
+  ) { }
 
   private getConcernedUserIds(
     expenseDto: CreateExpenseDto | UpdateExpenseDto,
@@ -182,8 +182,8 @@ export class ExpenseService {
     return this.expenseRepository.save(expense);
   }
 
-  findAll() {
-    return this.expenseRepository.find();
+  findAll(groupId: string) {
+    return this.expenseRepository.find({ where: { groupId } });
   }
 
   findOne(id: number) {

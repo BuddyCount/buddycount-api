@@ -17,7 +17,7 @@ import { AuthGuard } from '@nestjs/passport';
 @UseGuards(AuthGuard('jwt'))
 @Controller('group/:groupId/expense')
 export class GroupExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(private readonly expenseService: ExpenseService) { }
 
   @Post()
   create(
@@ -33,7 +33,6 @@ export class GroupExpenseController {
 
   @Get()
   findAll(@Param('groupId') groupId: string) {
-    // FIXME: add groupId to the method call
-    return this.expenseService.findAll();
+    return this.expenseService.findAll(groupId);
   }
 }
