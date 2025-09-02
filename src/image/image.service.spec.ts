@@ -45,6 +45,28 @@ describe('ImageService', () => {
       expect(() => service.getImage(filename)).toThrow(NotFoundException);
       expect(existsSync).toHaveBeenCalledWith(`/uploads/${filename}`);
     });
+
+    it('should call isSafeFilename when getting an image', () => {
+      const filename = 'test.jpg';
+      const isSafeSpy = jest.spyOn(service as any, 'isSafeFilename');
+
+      (existsSync as jest.Mock).mockReturnValue(true);
+      const fakeStream = {} as any;
+      (createReadStream as jest.Mock).mockReturnValue(fakeStream);
+      (join as jest.Mock).mockReturnValue(`/uploads/${filename}`);
+
+      service.getImage(filename);
+
+      expect(isSafeSpy).toHaveBeenCalledWith(filename);
+    });
+
+    it('should throw BadRequestException if filename is unsafe', () => {
+      const filename = '../file.jpg';
+      const isSafeSpy = jest.spyOn(service as any, 'isSafeFilename').mockReturnValue(false);
+
+      expect(() => service.getImage(filename)).toThrow(BadRequestException);
+      expect(isSafeSpy).toHaveBeenCalledWith(filename);
+    });
   });
 
   describe('isSafeFilename', () => {
