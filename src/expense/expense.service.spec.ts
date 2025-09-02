@@ -243,12 +243,12 @@ describe('ExpenseService', () => {
   // ----------------- FIND ALL -----------------
   describe('findAll', () => {
     it('should return all expenses', async () => {
-      const expenses = [{ id: 1 }] as any[];
+      const expenses = [{ id: 1, groupId: '1' }] as any[];
       repo.find.mockResolvedValue(expenses);
 
-      const result = await service.findAll();
+      const result = await service.findAll('1');
 
-      expect(repo.find).toHaveBeenCalled();
+      expect(repo.find).toHaveBeenCalledWith({ where: { groupId: '1' } });
       expect(result).toEqual(expenses);
     });
   });
