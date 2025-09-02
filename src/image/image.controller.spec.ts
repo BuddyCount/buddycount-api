@@ -36,7 +36,9 @@ describe('ImageController', () => {
     });
 
     it('should throw BadRequestException if file is undefined', () => {
-      expect(() => controller.uploadFile(undefined as any)).toThrow(BadRequestException);
+      expect(() => controller.uploadFile(undefined as any)).toThrow(
+        BadRequestException,
+      );
     });
   });
 

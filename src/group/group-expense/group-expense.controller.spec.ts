@@ -28,7 +28,11 @@ describe('GroupExpenseController', () => {
 
   describe('create', () => {
     it('should call service.create when groupId matches', async () => {
-      const dto: CreateExpenseDto = { groupId: '1', description: 'Dinner', amount: 50 } as any;
+      const dto: CreateExpenseDto = {
+        groupId: '1',
+        description: 'Dinner',
+        amount: 50,
+      } as any;
       const created = { id: 'exp1', ...dto } as any;
       service.create.mockResolvedValue(created);
 
@@ -39,7 +43,11 @@ describe('GroupExpenseController', () => {
     });
 
     it('should throw BadRequestException when groupId does not match', async () => {
-      const dto: CreateExpenseDto = { groupId: '2', description: 'Dinner', amount: 50 } as any;
+      const dto: CreateExpenseDto = {
+        groupId: '2',
+        description: 'Dinner',
+        amount: 50,
+      } as any;
 
       expect(() => controller.create(dto, '1')).toThrow(BadRequestException);
     });

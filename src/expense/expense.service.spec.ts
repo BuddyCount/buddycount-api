@@ -58,14 +58,20 @@ describe('ExpenseService', () => {
     const baseDto: CreateExpenseDto = {
       groupId: '1',
       amount: 100,
-      paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
-      paidFor: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
+      paidBy: {
+        repartitionType: 'AMOUNT',
+        repartition: [{ userId: 1, values: { amount: 100 } }],
+      },
+      paidFor: {
+        repartitionType: 'AMOUNT',
+        repartition: [{ userId: 1, values: { amount: 100 } }],
+      },
       images: ['img1'],
     } as any;
 
     it('should create expense successfully', async () => {
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
-      (imageService.getImage as jest.Mock).mockResolvedValue({}); 
+      (imageService.getImage as jest.Mock).mockResolvedValue({});
       repo.create.mockReturnValue(baseDto as any);
       repo.save.mockResolvedValue({ id: 'exp1', ...baseDto } as any);
 
@@ -82,18 +88,24 @@ describe('ExpenseService', () => {
       const dto = {
         groupId: '1',
         amount: 100,
-        paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
-        paidFor: { repartitionType: 'PORTIONS', repartition: [
-          { userId: 1, values: { share: 1 } },
-          { userId: 2, values: { share: 1 } },
-        ] },
+        paidBy: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: { amount: 100 } }],
+        },
+        paidFor: {
+          repartitionType: 'PORTIONS',
+          repartition: [
+            { userId: 1, values: { share: 1 } },
+            { userId: 2, values: { share: 1 } },
+          ],
+        },
         images: ['img1'],
       } as any;
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1, 2]);
       (imageService.getImage as jest.Mock).mockResolvedValue({});
-      repo.create.mockReturnValue(dto as any);
-      repo.save.mockResolvedValue({ id: 'exp2', ...dto } as any);
+      repo.create.mockReturnValue(dto);
+      repo.save.mockResolvedValue({ id: 'exp2', ...dto });
 
       const result = await service.create(dto);
 
@@ -112,24 +124,37 @@ describe('ExpenseService', () => {
     it('should throw if users are not in group', async () => {
       const dto = {
         ...baseDto,
-        paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 2, values: { amount: 100 } }] },
-        paidFor: { repartitionType: 'AMOUNT', repartition: [{ userId: 2, values: { amount: 100 } }] },
+        paidBy: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 2, values: { amount: 100 } }],
+        },
+        paidFor: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 2, values: { amount: 100 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if image not found', async () => {
-      (imageService.getImage as jest.Mock).mockRejectedValue(new Error('Not found'));
+      (imageService.getImage as jest.Mock).mockRejectedValue(
+        new Error('Not found'),
+      );
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
-      await expect(service.create(baseDto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(baseDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     // ----------------- VALIDATE PAID EDGE CASES -----------------
     it('should throw if paidBy repartitionType is PORTIONS', async () => {
       const dto = {
         ...baseDto,
-        paidBy: { repartitionType: 'PORTIONS', repartition: [{ userId: 1, values: { share: 1 } }] },
+        paidBy: {
+          repartitionType: 'PORTIONS',
+          repartition: [{ userId: 1, values: { share: 1 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -138,7 +163,10 @@ describe('ExpenseService', () => {
     it('should throw if paidFor repartitionType is invalid', async () => {
       const dto = {
         ...baseDto,
-        paidFor: { repartitionType: 'INVALID', repartition: [{ userId: 1, values: { amount: 100 } }] },
+        paidFor: {
+          repartitionType: 'INVALID',
+          repartition: [{ userId: 1, values: { amount: 100 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -147,7 +175,10 @@ describe('ExpenseService', () => {
     it('should throw if paidBy amounts do not sum to total', async () => {
       const dto = {
         ...baseDto,
-        paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 50 } }] },
+        paidBy: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -156,7 +187,10 @@ describe('ExpenseService', () => {
     it('should throw if paidFor amounts do not sum to total', async () => {
       const dto = {
         ...baseDto,
-        paidFor: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 50 } }] },
+        paidFor: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -165,7 +199,10 @@ describe('ExpenseService', () => {
     it('should throw if paidFor shares are negative', async () => {
       const dto = {
         ...baseDto,
-        paidFor: { repartitionType: 'PORTIONS', repartition: [{ userId: 1, values: { share: -1 } }] },
+        paidFor: {
+          repartitionType: 'PORTIONS',
+          repartition: [{ userId: 1, values: { share: -1 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -174,7 +211,10 @@ describe('ExpenseService', () => {
     it('should throw if total shares < 1', async () => {
       const dto = {
         ...baseDto,
-        paidFor: { repartitionType: 'PORTIONS', repartition: [{ userId: 1, values: { share: 0 } }] },
+        paidFor: {
+          repartitionType: 'PORTIONS',
+          repartition: [{ userId: 1, values: { share: 0 } }],
+        },
       } as any;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
@@ -213,8 +253,14 @@ describe('ExpenseService', () => {
       const dto: UpdateExpenseDto = {
         groupId: '1',
         amount: 100,
-        paidBy: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
-        paidFor: { repartitionType: 'AMOUNT', repartition: [{ userId: 1, values: { amount: 100 } }] },
+        paidBy: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: { amount: 100 } }],
+        },
+        paidFor: {
+          repartitionType: 'AMOUNT',
+          repartition: [{ userId: 1, values: { amount: 100 } }],
+        },
       } as any;
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);

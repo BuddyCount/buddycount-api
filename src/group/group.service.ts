@@ -7,11 +7,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class GroupService {
-
   constructor(
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
-  ) { }
+  ) {}
 
   create(createGroupDto: CreateGroupDto) {
     const group = this.groupRepository.create(createGroupDto);
@@ -22,7 +21,7 @@ export class GroupService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
-  async getGroupMemberIds(id: string): Promise<Number[]> {
+  async getGroupMemberIds(id: string): Promise<number[]> {
     const group = await this.groupRepository.findOne({
       where: { id: id },
     });
@@ -42,6 +41,9 @@ export class GroupService {
 
   join(linkToken: string) {
     // TODO: check auth
-    return this.groupRepository.findOne({ where: { linkToken }, select: ['id'] });
+    return this.groupRepository.findOne({
+      where: { linkToken },
+      select: ['id'],
+    });
   }
 }

@@ -32,7 +32,9 @@ describe('AuthService', () => {
 
       expect(tokenObj).toHaveProperty('access_token');
 
-      const decoded = jwtService.verify(tokenObj.access_token, { secret: 'testsecret' });
+      const decoded = jwtService.verify(tokenObj.access_token, {
+        secret: 'testsecret',
+      });
       expect(decoded).toHaveProperty('deviceId', deviceId);
     });
   });

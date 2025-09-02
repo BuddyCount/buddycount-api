@@ -41,7 +41,7 @@ async function bootstrap() {
   app.enableCors({
     origin: '*', // TODO: restrict in production
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'], 
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 

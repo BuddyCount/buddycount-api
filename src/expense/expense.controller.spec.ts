@@ -46,7 +46,10 @@ describe('ExpenseController', () => {
 
   describe('update', () => {
     it('should call service.update with numeric id and return result', async () => {
-      const dto: UpdateExpenseDto = { description: 'Updated', amount: 100 } as any;
+      const dto: UpdateExpenseDto = {
+        description: 'Updated',
+        amount: 100,
+      } as any;
       const updated = { affected: 1 } as any;
       service.update.mockResolvedValue(updated);
 
@@ -57,7 +60,10 @@ describe('ExpenseController', () => {
     });
 
     it('should throw if service.update fails', async () => {
-      const dto: UpdateExpenseDto = { description: 'Updated', amount: 100 } as any;
+      const dto: UpdateExpenseDto = {
+        description: 'Updated',
+        amount: 100,
+      } as any;
       service.update.mockRejectedValue(new Error('DB error'));
 
       await expect(controller.update('1', dto)).rejects.toThrow('DB error');

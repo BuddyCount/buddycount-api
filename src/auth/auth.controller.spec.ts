@@ -37,7 +37,9 @@ describe('AuthController', () => {
     });
 
     it('should throw BadRequestException if deviceId is missing', () => {
-      expect(() => controller.getToken(null as any)).toThrow(BadRequestException);
+      expect(() => controller.getToken(null as any)).toThrow(
+        BadRequestException,
+      );
       expect(() => controller.getToken(undefined)).toThrow(BadRequestException);
     });
   });

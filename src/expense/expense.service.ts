@@ -10,66 +10,74 @@ import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class ExpenseService {
-
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
     @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
     private readonly imageService: ImageService,
-  ) { }
+  ) {}
 
-  private getConcernedUserIds(expenseDto: CreateExpenseDto | UpdateExpenseDto): number[] {
-    const paidByIds = expenseDto.paidBy?.repartition?.map((r: any) => r.userId) || [];
-    const paidForIds = expenseDto.paidFor?.repartition?.map((r: any) => r.userId) || [];
+  private getConcernedUserIds(
+    expenseDto: CreateExpenseDto | UpdateExpenseDto,
+  ): number[] {
+    const paidByIds =
+      expenseDto.paidBy?.repartition?.map((r: any) => r.userId) || [];
+    const paidForIds =
+      expenseDto.paidFor?.repartition?.map((r: any) => r.userId) || [];
     return Array.from(new Set([...paidByIds, ...paidForIds]));
   }
 
   private async validateUsersInGroup(groupId: string, userIds: number[]) {
     const groupMembers = await this.groupService.getGroupMemberIds(groupId);
-    const invalidUsers = userIds.filter(uid => !groupMembers.includes(uid));
+    const invalidUsers = userIds.filter((uid) => !groupMembers.includes(uid));
     if (invalidUsers.length > 0) {
-      throw new BadRequestException(`Users not in group: ${invalidUsers.join(', ')}`);
+      throw new BadRequestException(
+        `Users not in group: ${invalidUsers.join(', ')}`,
+      );
     }
   }
 
-  private vaildateAmount(userShare: UserShareDto[], expense: 'paidBy' | 'paidFor', amount?: number) {
+  private vaildateAmount(
+    userShare: UserShareDto[],
+    expense: 'paidBy' | 'paidFor',
+    amount?: number,
+  ) {
     if (userShare !== undefined && userShare !== null) {
       const total = userShare
         .map((r: any) => Number(r.values?.amount) || 0)
         .reduce((a, b) => a + b, 0);
       if (total !== amount) {
         throw new BadRequestException(
-          `Sum of ${expense} repartition amounts (${total}) does not match expense amount (${amount})`
+          `Sum of ${expense} repartition amounts (${total}) does not match expense amount (${amount})`,
         );
       }
     } else {
-      throw new BadRequestException(
-        `${expense} repartition is required`
-      );
+      throw new BadRequestException(`${expense} repartition is required`);
     }
   }
 
-  private validatePortions(userShare: UserShareDto[], expense: 'paidBy' | 'paidFor') {
+  private validatePortions(
+    userShare: UserShareDto[],
+    expense: 'paidBy' | 'paidFor',
+  ) {
     if (expense === 'paidBy') {
       throw new BadRequestException(
-        `Repartition type "PORTIONS" is not allowed for paidBy`
+        `Repartition type "PORTIONS" is not allowed for paidBy`,
       );
     }
 
     if (userShare === undefined || userShare === null) {
-      throw new BadRequestException(
-        `${expense} repartition is required`
-      );
+      throw new BadRequestException(`${expense} repartition is required`);
     }
 
-    if (expense === "paidFor") {
+    if (expense === 'paidFor') {
       const invalidShares = userShare
         .map((r: any) => Number(r.values?.share) || 0)
         .filter((share: number) => share < 0);
       if (invalidShares.length > 0) {
         throw new BadRequestException(
-          `Shares in ${expense} repartition must be non-negative numbers`
+          `Shares in ${expense} repartition must be non-negative numbers`,
         );
       }
 
@@ -78,7 +86,7 @@ export class ExpenseService {
         .reduce((a, b) => a + b, 0);
       if (totalShares < 1) {
         throw new BadRequestException(
-          `Total shares in ${expense} repartition must be greater or equal to one`
+          `Total shares in ${expense} repartition must be greater or equal to one`,
         );
       }
     }
@@ -86,24 +94,32 @@ export class ExpenseService {
 
   private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
     // Check paidBy
-    if (expenseDto.paidBy?.repartitionType === "AMOUNT") {
-      this.vaildateAmount(expenseDto.paidBy?.repartition, 'paidBy', expenseDto.amount);
-    } else if (expenseDto.paidBy?.repartitionType === "PORTIONS") {
+    if (expenseDto.paidBy?.repartitionType === 'AMOUNT') {
+      this.vaildateAmount(
+        expenseDto.paidBy?.repartition,
+        'paidBy',
+        expenseDto.amount,
+      );
+    } else if (expenseDto.paidBy?.repartitionType === 'PORTIONS') {
       this.validatePortions(expenseDto.paidBy?.repartition, 'paidBy');
     } else {
       throw new BadRequestException(
-        `Repartition type "${expenseDto.paidBy?.repartitionType}" is not allowed for paidBy`
+        `Repartition type "${expenseDto.paidBy?.repartitionType}" is not allowed for paidBy`,
       );
     }
 
     // Check paidFor
-    if (expenseDto.paidFor?.repartitionType === "AMOUNT") {
-      this.vaildateAmount(expenseDto.paidFor?.repartition, 'paidFor', expenseDto.amount);
-    } else if (expenseDto.paidFor?.repartitionType === "PORTIONS") {
+    if (expenseDto.paidFor?.repartitionType === 'AMOUNT') {
+      this.vaildateAmount(
+        expenseDto.paidFor?.repartition,
+        'paidFor',
+        expenseDto.amount,
+      );
+    } else if (expenseDto.paidFor?.repartitionType === 'PORTIONS') {
       this.validatePortions(expenseDto.paidFor?.repartition, 'paidFor');
     } else {
       throw new BadRequestException(
-        `Invalid repartition type "${expenseDto.paidFor?.repartitionType}" for paidFor`
+        `Invalid repartition type "${expenseDto.paidFor?.repartitionType}" for paidFor`,
       );
     }
   }
@@ -113,7 +129,10 @@ export class ExpenseService {
       throw new BadRequestException('groupId is required');
     }
 
-    await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
+    await this.validateUsersInGroup(
+      createExpenseDto.groupId,
+      this.getConcernedUserIds(createExpenseDto),
+    );
     this.validatePaid(createExpenseDto);
 
     // If images links are provided, make sure they are valid
@@ -121,7 +140,9 @@ export class ExpenseService {
     if (createExpenseDto.images) {
       try {
         await Promise.all(
-          createExpenseDto.images.map(image => this.imageService.getImage(image))
+          createExpenseDto.images.map((image) =>
+            this.imageService.getImage(image),
+          ),
         );
       } catch (error) {
         throw new BadRequestException('Image not found');
@@ -144,7 +165,10 @@ export class ExpenseService {
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
-    await this.validateUsersInGroup(updateExpenseDto.groupId, this.getConcernedUserIds(updateExpenseDto));
+    await this.validateUsersInGroup(
+      updateExpenseDto.groupId,
+      this.getConcernedUserIds(updateExpenseDto),
+    );
     this.validatePaid(updateExpenseDto);
     return this.expenseRepository.update(id, updateExpenseDto);
   }

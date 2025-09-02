@@ -16,9 +16,9 @@ import { StreamableFile } from '@nestjs/common';
 import { MAX_IMAGE_SIZE } from 'src/utils/constants';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth() 
+@ApiBearerAuth()
 @ApiTags('Images')
-@UseGuards(AuthGuard('jwt')) 
+@UseGuards(AuthGuard('jwt'))
 @Controller('image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}

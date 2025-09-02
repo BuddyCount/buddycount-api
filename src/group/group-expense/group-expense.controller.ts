@@ -1,4 +1,12 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateExpenseDto } from 'src/expense/dto/create-expense.dto';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -12,7 +20,10 @@ export class GroupExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto, @Param('groupId') groupId: string) {
+  create(
+    @Body() createExpenseDto: CreateExpenseDto,
+    @Param('groupId') groupId: string,
+  ) {
     if (createExpenseDto.groupId !== groupId) {
       throw new BadRequestException('Group id does not match');
     }
