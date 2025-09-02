@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Currency, ExpenseCategory, RepartitionType } from 'src/utils/types';
 import { Type } from 'class-transformer';
@@ -164,4 +164,13 @@ export class CreateExpenseDto {
         example: paidForExample,
     })
     paidFor: PaidDetailsDto;
+
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    @ApiProperty({
+        description: 'The images of the expense, if any',
+        example: ['image1.jpg', 'image2.jpg'],
+    })
+    images?: string[];
 }

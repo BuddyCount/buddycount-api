@@ -3,28 +3,35 @@ import { ExpenseService } from './expense.service';
 import { Expense } from './entities/expense.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GroupService } from '../group/group.service';
+import { ImageService } from '../image/image.service';
 
 describe('ExpenseService', () => {
   let service: ExpenseService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ExpenseService, 
+      providers: [ExpenseService,
         {
-        provide: getRepositoryToken(Expense),
-        useValue: {
-          // create: jest.fn(),
-          // save: jest.fn(),
-          // findAll: jest.fn(),
+          provide: getRepositoryToken(Expense),
+          useValue: {
+            // create: jest.fn(),
+            // save: jest.fn(),
+            // findAll: jest.fn(),
+          },
         },
-      },
         {
           provide: GroupService,
           useValue: {
             getGroupMemberIds: jest.fn().mockResolvedValue([1, 2]), // mock method
           },
         },
-    ],
+        {
+          provide: ImageService,
+          useValue: {
+            getImage: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<ExpenseService>(ExpenseService);

@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupService } from '../group/group.service';
 import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class ExpenseService {
@@ -15,6 +16,7 @@ export class ExpenseService {
     private readonly expenseRepository: Repository<Expense>,
     @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
+    private readonly imageService: ImageService,
   ) { }
 
   private getConcernedUserIds(expenseDto: CreateExpenseDto | UpdateExpenseDto): number[] {
@@ -113,6 +115,18 @@ export class ExpenseService {
 
     await this.validateUsersInGroup(createExpenseDto.groupId, this.getConcernedUserIds(createExpenseDto));
     this.validatePaid(createExpenseDto);
+
+    // If images links are provided, make sure they are valid
+    // TODO: maybe securise this, now anyone can access any link
+    if (createExpenseDto.images) {
+      try {
+        await Promise.all(
+          createExpenseDto.images.map(image => this.imageService.getImage(image))
+        );
+      } catch (error) {
+        throw new BadRequestException('Image not found');
+      }
+    }
 
     const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
