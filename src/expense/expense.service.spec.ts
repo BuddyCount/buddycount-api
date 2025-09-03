@@ -18,6 +18,7 @@ describe('ExpenseService', () => {
   beforeEach(async () => {
     imageService = {
       getImage: jest.fn(),
+      deleteImage: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -301,9 +302,12 @@ describe('ExpenseService', () => {
   // ----------------- REMOVE -----------------
   describe('remove', () => {
     it('should delete expense', async () => {
+      repo.findOne.mockResolvedValue({ images: ['img1'] } as any);
       repo.delete.mockResolvedValue({ affected: 1 } as any);
 
       const result = await service.remove(1);
+
+      expect(imageService.deleteImage).toHaveBeenCalledWith('img1');
 
       expect(repo.delete).toHaveBeenCalledWith(1);
       expect(result).toEqual({ affected: 1 });

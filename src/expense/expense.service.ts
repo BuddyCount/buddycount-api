@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateExpenseDto, UserShareDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense } from './entities/expense.entity';
@@ -16,7 +16,7 @@ export class ExpenseService {
     @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
     private readonly imageService: ImageService,
-  ) { }
+  ) {}
 
   private getConcernedUserIds(
     expenseDto: CreateExpenseDto | UpdateExpenseDto,
@@ -202,7 +202,18 @@ export class ExpenseService {
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const expense = await this.expenseRepository.findOne({ where: { id } });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    // Delete all images related to the expense
+    for (const image of expense.images) {
+      this.imageService.deleteImage(image);
+    }
+
     return this.expenseRepository.delete(id);
   }
 }
