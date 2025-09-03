@@ -28,19 +28,19 @@ describe('ExpenseController', () => {
 
   describe('findOne', () => {
     it('should call service.findOne with numeric id and return result', async () => {
-      const expense = { id: 1, description: 'Dinner', amount: 50 } as any;
+      const expense = { id: 'a3850469-6b37-425c-96cc-9e352dac28e1', description: 'Dinner', amount: 50 } as any;
       service.findOne.mockResolvedValue(expense);
 
-      const result = await controller.findOne('1');
+      const result = await controller.findOne('a3850469-6b37-425c-96cc-9e352dac28e1');
 
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(service.findOne).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1');
       expect(result).toEqual(expense);
     });
 
     it('should throw if service.findOne fails', async () => {
       service.findOne.mockRejectedValue(new Error('DB error'));
 
-      await expect(controller.findOne('1')).rejects.toThrow('DB error');
+      await expect(controller.findOne('a3850469-6b37-425c-96cc-9e352dac28e1')).rejects.toThrow('DB error');
     });
   });
 
@@ -53,9 +53,9 @@ describe('ExpenseController', () => {
       const updated = { affected: 1 } as any;
       service.update.mockResolvedValue(updated);
 
-      const result = await controller.update('1', dto);
+      const result = await controller.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
 
-      expect(service.update).toHaveBeenCalledWith(1, dto);
+      expect(service.update).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
       expect(result).toEqual(updated);
     });
 
@@ -66,7 +66,7 @@ describe('ExpenseController', () => {
       } as any;
       service.update.mockRejectedValue(new Error('DB error'));
 
-      await expect(controller.update('1', dto)).rejects.toThrow('DB error');
+      await expect(controller.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto)).rejects.toThrow('DB error');
     });
   });
 
@@ -75,16 +75,16 @@ describe('ExpenseController', () => {
       const deleted = { affected: 1 } as any;
       service.remove.mockResolvedValue(deleted);
 
-      const result = await controller.remove('1');
+      const result = await controller.remove('a3850469-6b37-425c-96cc-9e352dac28e1');
 
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(service.remove).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1');
       expect(result).toEqual(deleted);
     });
 
     it('should throw if service.remove fails', async () => {
       service.remove.mockRejectedValue(new Error('DB error'));
 
-      await expect(controller.remove('1')).rejects.toThrow('DB error');
+      await expect(controller.remove('a3850469-6b37-425c-96cc-9e352dac28e1')).rejects.toThrow('DB error');
     });
   });
 });

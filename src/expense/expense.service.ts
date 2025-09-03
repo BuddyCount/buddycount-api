@@ -186,11 +186,11 @@ export class ExpenseService {
     return this.expenseRepository.find({ where: { groupId } });
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.expenseRepository.findOne({ where: { id } });
   }
 
-  async update(id: number, updateExpenseDto: UpdateExpenseDto) {
+  async update(id: string, updateExpenseDto: UpdateExpenseDto) {
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
@@ -202,7 +202,7 @@ export class ExpenseService {
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const expense = await this.expenseRepository.findOne({ where: { id } });
 
     if (!expense) {

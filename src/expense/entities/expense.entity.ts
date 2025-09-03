@@ -13,8 +13,8 @@ import {
 
 @Entity()
 export class Expense {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 30 })
   name: string;

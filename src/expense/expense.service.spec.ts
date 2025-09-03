@@ -244,7 +244,7 @@ describe('ExpenseService', () => {
   // ----------------- FIND ALL -----------------
   describe('findAll', () => {
     it('should return all expenses', async () => {
-      const expenses = [{ id: 1, groupId: '1' }] as any[];
+      const expenses = [{ id: 'a3850469-6b37-425c-96cc-9e352dac28e1', groupId: '1' }] as any[];
       repo.find.mockResolvedValue(expenses);
 
       const result = await service.findAll('1');
@@ -257,12 +257,12 @@ describe('ExpenseService', () => {
   // ----------------- FIND ONE -----------------
   describe('findOne', () => {
     it('should return single expense', async () => {
-      const expense = { id: 1 } as any;
+      const expense = { id: 'a3850469-6b37-425c-96cc-9e352dac28e1' } as any;
       repo.findOne.mockResolvedValue(expense);
 
-      const result = await service.findOne(1);
+      const result = await service.findOne('a3850469-6b37-425c-96cc-9e352dac28e1');
 
-      expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'a3850469-6b37-425c-96cc-9e352dac28e1' } });
       expect(result).toEqual(expense);
     });
   });
@@ -286,16 +286,16 @@ describe('ExpenseService', () => {
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       repo.update.mockResolvedValue({ affected: 1 } as any);
 
-      const result = await service.update(1, dto);
+      const result = await service.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
 
       expect(groupService.getGroupMemberIds).toHaveBeenCalledWith('1');
-      expect(repo.update).toHaveBeenCalledWith(1, dto);
+      expect(repo.update).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
       expect(result).toEqual({ affected: 1 });
     });
 
     it('should throw if groupId missing', async () => {
       const dto: UpdateExpenseDto = { amount: 100 } as any;
-      await expect(service.update(1, dto)).rejects.toThrow(BadRequestException);
+      await expect(service.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto)).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -305,11 +305,11 @@ describe('ExpenseService', () => {
       repo.findOne.mockResolvedValue({ images: ['img1'] } as any);
       repo.delete.mockResolvedValue({ affected: 1 } as any);
 
-      const result = await service.remove(1);
+      const result = await service.remove('a3850469-6b37-425c-96cc-9e352dac28e1');
 
       expect(imageService.deleteImage).toHaveBeenCalledWith('img1');
 
-      expect(repo.delete).toHaveBeenCalledWith(1);
+      expect(repo.delete).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1');
       expect(result).toEqual({ affected: 1 });
     });
   });
