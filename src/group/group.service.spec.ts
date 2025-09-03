@@ -43,7 +43,7 @@ describe('GroupService', () => {
         {
           provide: ExpenseService,
           useValue: expenseService,
-        }
+        },
       ],
     }).compile();
 

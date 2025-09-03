@@ -8,9 +8,13 @@ import { ExpenseModule } from 'src/expense/expense.module';
 import { ImageModule } from 'src/image/image.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Group]), forwardRef(() => ExpenseModule), ImageModule],
+  imports: [
+    TypeOrmModule.forFeature([Group]),
+    forwardRef(() => ExpenseModule),
+    ImageModule,
+  ],
   controllers: [GroupController, GroupExpenseController],
   providers: [GroupService],
   exports: [GroupService],
 })
-export class GroupModule { }
+export class GroupModule {}

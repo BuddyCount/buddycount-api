@@ -16,7 +16,7 @@ export class ExpenseService {
     @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
     private readonly imageService: ImageService,
-  ) { }
+  ) {}
 
   private getConcernedUserIds(
     expenseDto: CreateExpenseDto | UpdateExpenseDto,

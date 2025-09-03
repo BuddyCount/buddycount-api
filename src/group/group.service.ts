@@ -15,7 +15,7 @@ export class GroupService {
     @Inject(forwardRef(() => ExpenseService))
     private readonly expenseService: ExpenseService,
     private readonly imageService: ImageService,
-  ) { }
+  ) {}
 
   create(createGroupDto: CreateGroupDto) {
     const group = this.groupRepository.create(createGroupDto);

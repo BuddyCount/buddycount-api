@@ -10,7 +10,7 @@ import { createReadStream } from 'fs';
 
 @Injectable()
 export class ImageService {
-  constructor() { }
+  constructor() {}
 
   getImage(filename: string): StreamableFile {
     if (!this.isSafeFilename(filename)) {
@@ -45,11 +45,7 @@ export class ImageService {
     @returns The file path
   */
   private getFilePath(filename: string) {
-    return join(
-      process.cwd(),
-      process.env.UPLOAD_DIR || 'uploads',
-      filename,
-    );
+    return join(process.cwd(), process.env.UPLOAD_DIR || 'uploads', filename);
   }
 
   private isSafeFilename(filename: string): boolean {
