@@ -12,7 +12,7 @@ import { ExpenseService } from 'src/expense/expense.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @ApiTags('Group Expenses')
 @UseGuards(AuthGuard('jwt'))
 @Controller('group/:groupId/expense')

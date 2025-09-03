@@ -14,7 +14,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @ApiTags('Groups')
 @UseGuards(AuthGuard('jwt'))
 @Controller('group')
