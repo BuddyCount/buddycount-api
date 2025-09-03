@@ -153,11 +153,31 @@ export class ExpenseService {
     }
   }
 
+  private validateUniqueUsers(
+    paidBy?: UserShareDto[],
+    paidFor?: UserShareDto[],
+  ) {
+    for (const userShare of [paidBy, paidFor]) {
+      const userIds = userShare?.map((r) => r.userId) || [];
+      const uniqueUserIds = new Set(userIds);
+
+      if (userIds.length !== uniqueUserIds.size) {
+        throw new BadRequestException(
+          'User ids in a repartition must be unique',
+        );
+      }
+    }
+  }
+
   async create(createExpenseDto: CreateExpenseDto) {
     if (!createExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
 
+    this.validateUniqueUsers(
+      createExpenseDto.paidBy.repartition,
+      createExpenseDto.paidFor.repartition,
+    );
     await this.validateUsersInGroup(
       createExpenseDto.groupId,
       this.getConcernedUserIds(createExpenseDto),
@@ -194,11 +214,17 @@ export class ExpenseService {
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
+
+    this.validateUniqueUsers(
+      updateExpenseDto.paidBy?.repartition,
+      updateExpenseDto.paidFor?.repartition,
+    );
     await this.validateUsersInGroup(
       updateExpenseDto.groupId,
       this.getConcernedUserIds(updateExpenseDto),
     );
     this.validatePaid(updateExpenseDto);
+
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 

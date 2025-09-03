@@ -1,5 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { CreateGroupDto, UserIndexDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Repository } from 'typeorm';
 import { Group } from './entities/group.entity';
@@ -18,6 +23,9 @@ export class GroupService {
   ) {}
 
   create(createGroupDto: CreateGroupDto) {
+    // Make sure user ids are unique
+    this.validateUserIndexDto(createGroupDto.users);
+
     const group = this.groupRepository.create(createGroupDto);
     return this.groupRepository.save(group);
   }
@@ -39,6 +47,9 @@ export class GroupService {
   }
 
   update(id: string, updateGroupDto: UpdateGroupDto) {
+    // Make sure user ids are unique
+    this.validateUserIndexDto(updateGroupDto.users);
+
     return this.groupRepository.update(id, updateGroupDto);
   }
 
@@ -65,5 +76,14 @@ export class GroupService {
       where: { linkToken },
       select: ['id'],
     });
+  }
+
+  private validateUserIndexDto(userIndexDto?: UserIndexDto[]) {
+    const indexes = userIndexDto?.map((userIndexDto) => userIndexDto.id) || [];
+    const uniqueIndexes = new Set(indexes);
+
+    if (indexes.length !== uniqueIndexes.size) {
+      throw new BadRequestException('User ids in a group must be unique');
+    }
   }
 }
