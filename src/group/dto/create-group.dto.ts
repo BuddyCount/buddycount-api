@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   ValidateNested,
@@ -39,7 +40,7 @@ export class CreateGroupDto {
   })
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   @ApiProperty({

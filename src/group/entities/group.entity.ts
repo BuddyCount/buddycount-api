@@ -24,8 +24,8 @@ export class Group {
   @Column({ type: 'varchar', length: 30 })
   name: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  description: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  description?: string;
 
   @Column({ type: 'enum', enum: Currency })
   currency: Currency;
