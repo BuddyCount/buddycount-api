@@ -29,7 +29,10 @@ export class GroupController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query('withExpenses', ParseBoolPipe) withExpenses: boolean) {
+  findOne(
+    @Param('id') id: string,
+    @Query('withExpenses', ParseBoolPipe) withExpenses: boolean,
+  ) {
     return this.groupService.findOne(id, withExpenses);
   }
 
