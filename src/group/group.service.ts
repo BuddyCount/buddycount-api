@@ -22,8 +22,10 @@ export class GroupService {
     return this.groupRepository.save(group);
   }
 
-  findOne(id: string) {
-    return this.groupRepository.findOne({ where: { id } });
+  findOne(id: string, withExpenses: boolean) {
+    const relations = withExpenses ? ['expenses'] : [];
+
+    return this.groupRepository.findOne({ where: { id }, relations });
   }
 
   async getGroupMemberIds(id: string): Promise<number[]> {

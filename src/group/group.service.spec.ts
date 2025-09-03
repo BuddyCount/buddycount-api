@@ -74,9 +74,25 @@ describe('GroupService', () => {
       const group = { id: '1', name: 'Test' } as Group;
       repo.findOne.mockResolvedValue(group);
 
-      const result = await service.findOne('1');
+      const result = await service.findOne('1', false);
 
-      expect(repo.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+        relations: [],
+      });
+      expect(result).toEqual(group);
+    });
+
+    it('should return a group by id with its expenses', async () => {
+      const group = { id: '1', name: 'Test' } as Group;
+      repo.findOne.mockResolvedValue(group);
+
+      const result = await service.findOne('1', true);
+
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+        relations: ['expenses'],
+      });
       expect(result).toEqual(group);
     });
   });

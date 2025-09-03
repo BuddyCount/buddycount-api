@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -27,8 +29,11 @@ export class GroupController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query('withExpenses', ParseBoolPipe) withExpenses: boolean,
+  ) {
+    return this.groupService.findOne(id, withExpenses);
   }
 
   @Patch(':id')
