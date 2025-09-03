@@ -12,7 +12,7 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @ApiTags('Expenses')
 @UseGuards(AuthGuard('jwt'))
 @Controller('expense')
