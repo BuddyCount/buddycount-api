@@ -5,12 +5,24 @@ import { Group } from './entities/group.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { ImageService } from 'src/image/image.service';
+import { ExpenseService } from 'src/expense/expense.service';
 
 describe('GroupService', () => {
   let service: GroupService;
   let repo: jest.Mocked<Repository<Group>>;
+  let imageService: Partial<ImageService>;
+  let expenseService: Partial<ExpenseService>;
 
   beforeEach(async () => {
+    imageService = {
+      getImage: jest.fn(),
+      deleteImage: jest.fn(),
+    };
+    expenseService = {
+      findAll: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GroupService,
@@ -24,11 +36,21 @@ describe('GroupService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: ImageService,
+          useValue: imageService,
+        },
+        {
+          provide: ExpenseService,
+          useValue: expenseService,
+        }
       ],
     }).compile();
 
     service = module.get<GroupService>(GroupService);
     repo = module.get(getRepositoryToken(Group));
+    imageService = module.get(ImageService);
+    expenseService = module.get(ExpenseService);
   });
 
   describe('create', () => {
@@ -105,6 +127,7 @@ describe('GroupService', () => {
   describe('remove', () => {
     it('should delete a group by id', async () => {
       const deleteResult = { affected: 1 } as any;
+      (expenseService.findAll as jest.Mock).mockResolvedValue([]);
       repo.delete.mockResolvedValue(deleteResult);
 
       const result = await service.remove('1');
