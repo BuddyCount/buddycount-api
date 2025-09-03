@@ -54,16 +54,16 @@ describe('GroupController', () => {
       const group = { id: '1', name: 'Test' } as any;
       service.findOne.mockResolvedValue(group);
 
-      const result = await controller.findOne('1');
+      const result = await controller.findOne('1', false);
 
-      expect(service.findOne).toHaveBeenCalledWith('1');
+      expect(service.findOne).toHaveBeenCalledWith('1', false);
       expect(result).toEqual(group);
     });
 
     it('should throw if service.findOne fails', async () => {
       service.findOne.mockRejectedValue(new Error('Not found'));
 
-      await expect(controller.findOne('1')).rejects.toThrow('Not found');
+      await expect(controller.findOne('1', false)).rejects.toThrow('Not found');
     });
   });
 
