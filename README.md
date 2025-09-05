@@ -1,5 +1,7 @@
 # BuddyCount API
 
+Here you'll find some recommendations to run the api locally and access the database.
+
 ## Project setup
 
 ```bash
