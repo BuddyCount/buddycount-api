@@ -1,12 +1,14 @@
 /**
- * Holt-Winters Forecasting Library
+ * RubyGarage.
+ * https://rubygarage.org/
  *
- * Original JS by RubyGarage & QXIP/Metrico
- * Converted to TypeScript
+ * Copyright (c) 2016 RubyGarage.
+ * Licensed under the MIT license.
+ * Ported to TypeScript
  */
 
 export interface AugmentedResult {
-    augumentedDataset: number[] | number[][];
+    augumentedDataset: number[];
     alpha: number;
     beta: number;
     gamma: number;
@@ -16,85 +18,50 @@ export interface AugmentedResult {
     mpe: number;
 }
 
-type NumericArray = number[];
-type Matrix = number[][];
-
-export function getAugumentedDataset(
-    data: NumericArray | Matrix,
-    m: number
-): AugmentedResult | false {
-    // Multi Dimensional Array
-    if (Array.isArray(data[0])) {
-        const tmp: AugmentedResult[] = [];
-        const cache: number[][] = Array.from(
-            { length: (data as Matrix)[0].length },
-            () => []
-        );
-
-        (data as Matrix).forEach((set) => {
-            cache.forEach((_, i) => {
-                cache[i].push(set[i]);
-            });
-        });
-
-        cache.forEach((arr, i) => {
-            const res = getAugumentedDataset(arr, m);
-            if (res !== false) tmp[i] = res;
-        });
-
-        // Merge All Dimensions
-        tmp[0].augumentedDataset = compactDataset("augumentedDataset", tmp);
-        return tmp[0];
-    }
-
-    // Mono Dimensional Array
-    const series = data as NumericArray;
+/**
+ * Returns augmented dataset, seasonal coefficients and errors.
+ *
+ * @param data - input data
+ * @param m - extrapolated future data points
+ *
+ * @returns AugmentedResult
+ */
+export function getAugumentedDataset(data: number[], m: number): AugmentedResult {
     const initialparams = [0.0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0];
-    let alpha = 0,
-        beta = 0,
-        gamma = 0,
-        period = 0,
-        prediction: number[] | undefined;
-
+    let alpha = 0;
+    let beta = 0;
+    let gamma = 0;
+    let period = 0;
+    let prediction: number[] = [];
     let err = Infinity;
-    const isFloat = series.reduce((a, b) => a + b, 0) % 1 === 0;
 
-    // Brute-force optimization
-    initialparams.forEach((a) => {
-        initialparams.forEach((b) => {
-            initialparams.forEach((g) => {
-                for (let p = 1; p < series.length / 2; p++) {
-                    const currentPrediction = getForecast(series, a, b, g, p, m);
-                    if (!currentPrediction) continue;
-
-                    if (isFloat) {
-                        for (let i = 0; i < currentPrediction.length; i++) {
-                            currentPrediction[i] = Math.trunc(currentPrediction[i]);
-                        }
+    // TODO: rewrite this brute force with Levenberg-Marquardt equation
+    initialparams.forEach(a => {
+        initialparams.forEach(b => {
+            initialparams.forEach(g => {
+                for (let p = 1; p < data.length / 2; p++) {
+                    const currentPrediction = getForecast(data, a, b, g, p, m);
+                    let error: number | undefined;
+                    if (currentPrediction) {
+                        error = mse(data, currentPrediction, p);
                     }
 
-                    const error = mse(series, currentPrediction, p);
-                    if (error < err) {
+                    if (error !== undefined && err > error) {
                         err = error;
                         alpha = a;
                         beta = b;
                         gamma = g;
                         period = p;
-                        prediction = currentPrediction;
+                        prediction = currentPrediction || [];
                     }
                 }
             });
         });
     });
 
-    if (!prediction) {
-        if (m > 1) return getAugumentedDataset(series, m - 1);
-        return false;
-    }
-
-    const augumentedDataset = [...prediction];
-    for (let i = 0; i < series.length; i++) {
-        augumentedDataset[i] = series[i];
+    const augumentedDataset = prediction.slice();
+    for (let i = 0; i < data.length; i++) {
+        augumentedDataset[i] = data[i];
     }
 
     return {
@@ -103,9 +70,9 @@ export function getAugumentedDataset(
         beta,
         gamma,
         period,
-        mse: mse(series, prediction, period),
-        sse: sse(series, prediction, period),
-        mpe: mpe(series, prediction, period),
+        mse: mse(data, prediction, period),
+        sse: sse(data, prediction, period),
+        mpe: mpe(data, prediction, period),
     };
 }
 
@@ -117,7 +84,9 @@ function getForecast(
     period: number,
     m: number
 ): number[] | undefined {
-    if (!validArgs(data, alpha, beta, gamma, period, m)) return;
+    if (!validArgs(data, alpha, beta, gamma, period, m)) {
+        return;
+    }
 
     const seasons = Math.floor(data.length / period);
     const st1 = data[0];
@@ -215,13 +184,14 @@ function calcHoltWinters(
     const st: number[] = [];
     const bt: number[] = [];
     const it: number[] = [];
-    const ft: number[] = [];
+    const ft: number[] = Array(len + m).fill(0);
 
     st[1] = st1;
     bt[1] = bt1;
 
-    for (let i = 0; i < len; i++) ft[i] = 0.0;
-    for (let i = 0; i < period; i++) it[i] = seasonal[i];
+    for (let i = 0; i < period; i++) {
+        it[i] = seasonal[i];
+    }
 
     for (let i = 2; i < len; i++) {
         if (i - period >= 0) {
@@ -244,26 +214,4 @@ function calcHoltWinters(
     }
 
     return ft;
-}
-
-function compactDataset(
-    key: keyof AugmentedResult,
-    arrays: AugmentedResult[]
-): number[][] {
-    const base = arrays[0][key];
-
-    if (!Array.isArray(base)) {
-        throw new Error(`compactDataset: '${key}' is not an array`);
-    }
-
-    // Ensure we're working with a 2D array
-    return (base as number[]).map((_, i) =>
-        arrays.map((array) => {
-            const arrVal = array[key];
-            if (Array.isArray(arrVal)) {
-                return (arrVal as number[])[i];
-            }
-            throw new Error(`compactDataset: Invalid structure at index ${i}`);
-        })
-    );
 }

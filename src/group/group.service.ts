@@ -92,12 +92,10 @@ export class GroupService {
   async predictGroupExpenses(groupId: string, startDate: Date, predictionLength: number) {
     let expenses = await this.parseGroupExpenses(groupId, startDate);
     console.log('expenses', expenses);
-    // expenses = [1, 4, 5, 3, 1, 3, 4, 1, 2, 4, 5, 5];
-    // console.log('expenses2', expenses);
 
-    // Make sure there is enough data to predict
-    if (expenses.length < MIN_EXPENSES_TO_PREDICT) {
-      return new BadRequestException('Not enough expenses to predict in given period');
+    // Make sure there is enough data to predict. Add 2 * predictionLength to account for the extra data needed to predict as predictionLength increases
+    if (expenses.length < MIN_EXPENSES_TO_PREDICT + 2 * predictionLength) {
+      return new BadRequestException('Not enough expenses to predict in given period, or too many predicted expenses wanted');
     }
 
     const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
@@ -164,11 +162,6 @@ export class GroupService {
     for (let i = 0; i < expenses.length; i++) {
       if (firstNonZeroIndex === -1 && expenses[i] > 0) {
         firstNonZeroIndex = i;
-      }
-
-      if (firstNonZeroIndex !== -1 && expenses[i] === 0) {
-        expenses[i] = .01;
-        continue;
       }
     }
 
