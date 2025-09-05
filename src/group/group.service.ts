@@ -3,16 +3,18 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateGroupDto, UserIndexDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 import { Group } from './entities/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ImageService } from 'src/image/image.service';
 import { differenceInCalendarDays } from 'date-fns';
 import { getAugumentedDataset } from "src/types/holtwinters";
+import { MIN_EXPENSES_TO_PREDICT, PREDICTION_CUTOFF_AMOUNT } from 'src/utils/constants';
 
 @Injectable()
 export class GroupService {
@@ -80,16 +82,44 @@ export class GroupService {
     });
   }
 
-  async predictGroupExpenses(groupId: string, startDate: Date) {
-    const expenses = await this.parseGroupExpenses(groupId, startDate);
-    console.log(expenses);
+  /* 
+   * Predict future expenses for a given group using Holt-Winters algorithm
+   * @param groupId - The id of the group
+   * @param startDate - The start date of the prediction
+   * @param predictionLength - The length of the prediction
+   * @returns The predicted expenses
+   */
+  async predictGroupExpenses(groupId: string, startDate: Date, predictionLength: number) {
+    let expenses = await this.parseGroupExpenses(groupId, startDate);
+    console.log('expenses', expenses);
+    // expenses = [1, 4, 5, 3, 1, 3, 4, 1, 2, 4, 5, 5];
+    // console.log('expenses2', expenses);
 
-    const predictionLength = 4;
+    // Make sure there is enough data to predict
+    if (expenses.length < MIN_EXPENSES_TO_PREDICT) {
+      return new BadRequestException('Not enough expenses to predict in given period');
+    }
 
     const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
     console.log(predictedExpenses);
 
-    return predictedExpenses;
+    if (!predictedExpenses) {
+      return new InternalServerErrorException('Could not predict future expenses');
+    }
+
+    // Keep only the predicted expenses
+    predictedExpenses.augumentedDataset = predictedExpenses.augumentedDataset.slice(expenses.length);
+
+    // Truncate to 2 decimal places and remove any values less than PREDICTION_CUTOFF_AMOUNT
+    for (let i = 0; i < predictedExpenses.augumentedDataset.length; i++) {
+      if ((predictedExpenses.augumentedDataset[i] as number) < PREDICTION_CUTOFF_AMOUNT) {
+        predictedExpenses.augumentedDataset[i] = 0;
+      }
+
+      predictedExpenses.augumentedDataset[i] = Math.trunc((predictedExpenses.augumentedDataset[i] as number) * 100) / 100;
+    }
+
+    return predictedExpenses.augumentedDataset;
   }
 
   private validateUserIndexDto(userIndexDto?: UserIndexDto[]) {
@@ -116,6 +146,8 @@ export class GroupService {
       date: expense.date,
     }));
 
+    console.log(expensesWithDates);
+
     // Create array of expenses with 0 for each day
     let expenses = new Array<number>(differenceInCalendarDays(new Date(), startDate)).fill(0);
 
@@ -124,6 +156,8 @@ export class GroupService {
       const index = differenceInCalendarDays(expensesWithDates[i].date, startDate);
       expenses[index] += expensesWithDates[i].amount;  // Cumulate expenses of the same day
     }
+
+    console.log(expenses);
 
     // Keep only from first non-zero expense to the end + add a small amount to the null expenses
     let firstNonZeroIndex = -1;

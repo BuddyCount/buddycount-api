@@ -52,7 +52,7 @@ export class GroupController {
   }
 
   @Get(':id/predict')
-  predict(@Param('id') id: string, @Query('startDate') startDate: Date) {
-    return this.groupService.predictGroupExpenses(id, startDate);
+  predict(@Param('id') id: string, @Query('startDate') startDate: Date, @Query('predictionLength') predictionLength: number = 7) {
+    return this.groupService.predictGroupExpenses(id, startDate, predictionLength);
   }
 }
