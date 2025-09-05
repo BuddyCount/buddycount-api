@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth('access-token')
@@ -41,6 +41,11 @@ export class ExpenseController {
     name: 'id',
     type: 'string',
     description: 'The uuid of the expense',
+    required: true,
+  })
+  @ApiBody({
+    type: UpdateExpenseDto,
+    description: 'The data to update the expense. Can provide only the needed fields.',
     required: true,
   })
   update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {

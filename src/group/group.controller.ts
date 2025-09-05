@@ -12,7 +12,7 @@ import {
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { ApiBearerAuth, ApiTags, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Groups')
@@ -21,6 +21,11 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
   @Post()
+  @ApiBody({
+    type: CreateGroupDto,
+    description: 'The data to create the group',
+    required: true,
+  })
   create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupService.create(createGroupDto);
   }
@@ -51,6 +56,11 @@ export class GroupController {
     name: 'id',
     type: 'string',
     description: 'The uuid of the group',
+    required: true,
+  })
+  @ApiBody({
+    type: UpdateGroupDto,
+    description: 'The data to update the group. Can provide only the needed fields.',
     required: true,
   })
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {

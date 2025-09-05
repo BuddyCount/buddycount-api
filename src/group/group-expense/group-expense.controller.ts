@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateExpenseDto } from 'src/expense/dto/create-expense.dto';
 import { ExpenseService } from 'src/expense/expense.service';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Group Expenses')
@@ -17,6 +17,11 @@ export class GroupExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
 
   @Post()
+  @ApiBody({
+    type: CreateExpenseDto,
+    description: 'The data to create the expense',
+    required: true,
+  })
   @ApiParam({
     name: 'groupId',
     type: 'string',
