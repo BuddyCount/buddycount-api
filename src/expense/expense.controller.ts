@@ -39,7 +39,8 @@ export class ExpenseController {
   })
   @ApiBody({
     type: UpdateExpenseDto,
-    description: 'The data to update the expense. Can provide only the needed fields.',
+    description:
+      'The data to update the expense. Can provide only the needed fields.',
     required: true,
   })
   update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {

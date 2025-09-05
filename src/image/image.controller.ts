@@ -8,7 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { ApiBody, ApiConsumes, ApiBearerAuth, ApiTags, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiBearerAuth,
+  ApiTags,
+  ApiParam,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseFilePipe, UploadedFile } from '@nestjs/common';
 import { MaxFileSizeValidator } from '@nestjs/common';
