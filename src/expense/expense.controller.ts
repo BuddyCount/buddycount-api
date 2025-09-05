@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth('access-token')
@@ -26,16 +26,34 @@ export class ExpenseController {
   // }
 
   @Get(':id')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'The uuid of the expense',
+    required: true,
+  })
   findOne(@Param('id') id: string) {
     return this.expenseService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'The uuid of the expense',
+    required: true,
+  })
   update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
     return this.expenseService.update(id, updateExpenseDto);
   }
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'The uuid of the expense',
+    required: true,
+  })
   remove(@Param('id') id: string) {
     return this.expenseService.remove(id);
   }

@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { ApiBody, ApiConsumes, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiBearerAuth, ApiTags, ApiParam } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseFilePipe, UploadedFile } from '@nestjs/common';
 import { MaxFileSizeValidator } from '@nestjs/common';
@@ -58,6 +58,12 @@ export class ImageController {
   }
 
   @Get(':filename')
+  @ApiParam({
+    name: 'filename',
+    type: 'string',
+    description: 'The filename of the image, returned by the upload endpoint',
+    required: true,
+  })
   getFile(@Param('filename') filename: string): StreamableFile {
     return this.imageService.getImage(filename);
   }
