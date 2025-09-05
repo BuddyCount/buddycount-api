@@ -103,7 +103,7 @@ export class GroupService {
 
   private async parseGroupExpenses(groupId: string, startDate: Date) {
     const group = await this.groupRepository.findOne({
-      where: { id: groupId, expenses: { date: MoreThan(startDate) } },
+      where: { id: groupId, expenses: { date: MoreThanOrEqual(startDate) } },
       relations: ['expenses'],
     });
 
