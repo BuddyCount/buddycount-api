@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { AuthService, JwtPayload } from './auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
@@ -10,7 +10,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         JwtModule.register({
-          secret: 'testsecret',
+          secret: 'supersecret',
           signOptions: { expiresIn: '1h' },
         }),
       ],
@@ -32,10 +32,10 @@ describe('AuthService', () => {
 
       expect(tokenObj).toHaveProperty('access_token');
 
-      const decoded = jwtService.verify(tokenObj.access_token, {
-        secret: 'testsecret',
+      const decoded = jwtService.verify<JwtPayload>(tokenObj.access_token, {
+        secret: 'supersecret',
       });
-      expect(decoded).toHaveProperty('deviceId', deviceId);
+      expect(decoded.deviceId).toBe(deviceId);
     });
   });
 
@@ -44,8 +44,8 @@ describe('AuthService', () => {
       const deviceId = 'device-456';
       const tokenObj = service.generateToken(deviceId);
 
-      const payload = service.validateToken(tokenObj.access_token);
-      expect(payload).toHaveProperty('deviceId', deviceId);
+      const payload: JwtPayload = service.validateToken(tokenObj.access_token);
+      expect(payload.deviceId).toBe(deviceId);
     });
 
     it('should throw an error for an invalid token', () => {

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExpenseController } from './expense.controller';
 import { ExpenseService } from './expense.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { Expense } from './entities/expense.entity';
+import { UpdateResult, DeleteResult } from 'typeorm';
 
 describe('ExpenseController', () => {
   let controller: ExpenseController;
@@ -32,13 +34,14 @@ describe('ExpenseController', () => {
         id: 'a3850469-6b37-425c-96cc-9e352dac28e1',
         description: 'Dinner',
         amount: 50,
-      } as any;
+      } as unknown as Expense;
       service.findOne.mockResolvedValue(expense);
 
       const result = await controller.findOne(
         'a3850469-6b37-425c-96cc-9e352dac28e1',
       );
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.findOne).toHaveBeenCalledWith(
         'a3850469-6b37-425c-96cc-9e352dac28e1',
       );
@@ -59,8 +62,8 @@ describe('ExpenseController', () => {
       const dto: UpdateExpenseDto = {
         description: 'Updated',
         amount: 100,
-      } as any;
-      const updated = { affected: 1 } as any;
+      } as UpdateExpenseDto;
+      const updated = { affected: 1 } as UpdateResult;
       service.update.mockResolvedValue(updated);
 
       const result = await controller.update(
@@ -68,6 +71,7 @@ describe('ExpenseController', () => {
         dto,
       );
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.update).toHaveBeenCalledWith(
         'a3850469-6b37-425c-96cc-9e352dac28e1',
         dto,
@@ -79,7 +83,7 @@ describe('ExpenseController', () => {
       const dto: UpdateExpenseDto = {
         description: 'Updated',
         amount: 100,
-      } as any;
+      } as UpdateExpenseDto;
       service.update.mockRejectedValue(new Error('DB error'));
 
       await expect(
@@ -90,13 +94,14 @@ describe('ExpenseController', () => {
 
   describe('remove', () => {
     it('should call service.remove with numeric id and return result', async () => {
-      const deleted = { affected: 1 } as any;
+      const deleted = { affected: 1 } as DeleteResult;
       service.remove.mockResolvedValue(deleted);
 
       const result = await controller.remove(
         'a3850469-6b37-425c-96cc-9e352dac28e1',
       );
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.remove).toHaveBeenCalledWith(
         'a3850469-6b37-425c-96cc-9e352dac28e1',
       );

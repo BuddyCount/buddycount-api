@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GroupService } from './group.service';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult, DeleteResult } from 'typeorm';
 import { Group } from './entities/group.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -55,7 +55,7 @@ describe('GroupService', () => {
 
   describe('create', () => {
     it('should create and save a group', async () => {
-      const dto: CreateGroupDto = { name: 'Test Group' } as any;
+      const dto: CreateGroupDto = { name: 'Test Group' } as CreateGroupDto;
       const created = { id: '1', ...dto } as Group;
 
       repo.create.mockReturnValue(created);
@@ -63,7 +63,9 @@ describe('GroupService', () => {
 
       const result = await service.create(dto);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.create).toHaveBeenCalledWith(dto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.save).toHaveBeenCalledWith(created);
       expect(result).toEqual(created);
     });
@@ -76,6 +78,7 @@ describe('GroupService', () => {
 
       const result = await service.findOne('1', false);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
         relations: [],
@@ -89,6 +92,7 @@ describe('GroupService', () => {
 
       const result = await service.findOne('1', true);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
         relations: ['expenses'],
@@ -107,7 +111,10 @@ describe('GroupService', () => {
     });
 
     it('should return empty array if group has no users', async () => {
-      repo.findOne.mockResolvedValue({ id: '1', users: null } as any);
+      repo.findOne.mockResolvedValue({
+        id: '1',
+        users: null,
+      } as unknown as Group);
 
       const result = await service.getGroupMemberIds('1');
 
@@ -118,7 +125,7 @@ describe('GroupService', () => {
       const group = {
         id: '1',
         users: [{ id: 10 }, { id: 20 }],
-      } as any;
+      } as Group;
       repo.findOne.mockResolvedValue(group);
 
       const result = await service.getGroupMemberIds('1');
@@ -129,12 +136,13 @@ describe('GroupService', () => {
 
   describe('update', () => {
     it('should update a group by id', async () => {
-      const dto: UpdateGroupDto = { name: 'Updated' } as any;
-      const updateResult = { affected: 1 } as any;
+      const dto: UpdateGroupDto = { name: 'Updated' } as UpdateGroupDto;
+      const updateResult = { affected: 1 } as UpdateResult;
       repo.update.mockResolvedValue(updateResult);
 
       const result = await service.update('1', dto);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.update).toHaveBeenCalledWith('1', dto);
       expect(result).toEqual(updateResult);
     });
@@ -142,12 +150,13 @@ describe('GroupService', () => {
 
   describe('remove', () => {
     it('should delete a group by id', async () => {
-      const deleteResult = { affected: 1 } as any;
+      const deleteResult = { affected: 1 } as DeleteResult;
       (expenseService.findAll as jest.Mock).mockResolvedValue([]);
       repo.delete.mockResolvedValue(deleteResult);
 
       const result = await service.remove('1');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.delete).toHaveBeenCalledWith('1');
       expect(result).toEqual(deleteResult);
     });
@@ -155,11 +164,12 @@ describe('GroupService', () => {
 
   describe('join', () => {
     it('should return group id when linkToken matches', async () => {
-      const group = { id: '1' } as any;
+      const group = { id: '1' } as Group;
       repo.findOne.mockResolvedValue(group);
 
       const result = await service.join('token123');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.findOne).toHaveBeenCalledWith({
         where: { linkToken: 'token123' },
         select: ['id'],
