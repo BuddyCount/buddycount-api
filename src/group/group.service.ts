@@ -156,7 +156,7 @@ export class GroupService {
 
     // Populate array with expenses
     for (let i = 0; i < expensesWithDates.length; i++) {
-      const index = differenceInCalendarDays(expensesWithDates[i].date, startDate);
+      const index = differenceInCalendarDays(expensesWithDates[i].date, startDate) - 1;
       expenses[index] += expensesWithDates[i].amount;  // Cumulate expenses of the same day
     }
 
