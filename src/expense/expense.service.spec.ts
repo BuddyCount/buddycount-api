@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExpenseService } from './expense.service';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult, DeleteResult } from 'typeorm';
 import { Expense } from './entities/expense.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GroupService } from '../group/group.service';
@@ -13,7 +13,7 @@ describe('ExpenseService', () => {
   let service: ExpenseService;
   let repo: jest.Mocked<Repository<Expense>>;
   let groupService: jest.Mocked<GroupService>;
-  let imageService: Partial<ImageService>;
+  let imageService: Partial<jest.Mocked<ImageService>>;
 
   beforeEach(async () => {
     imageService = {
@@ -48,7 +48,7 @@ describe('ExpenseService', () => {
       ],
     }).compile();
 
-    service = module.get(ExpenseService);
+    service = module.get<ExpenseService>(ExpenseService);
     repo = module.get(getRepositoryToken(Expense));
     groupService = module.get(GroupService);
     imageService = module.get(ImageService);
@@ -68,25 +68,29 @@ describe('ExpenseService', () => {
         repartition: [{ userId: 1, values: { amount: 100 } }],
       },
       images: ['img1'],
-    } as any;
+    } as CreateExpenseDto;
 
     it('should create expense successfully', async () => {
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       (imageService.getImage as jest.Mock).mockResolvedValue({});
-      repo.create.mockReturnValue(baseDto as any);
-      repo.save.mockResolvedValue({ id: 'exp1', ...baseDto } as any);
+      repo.create.mockReturnValue(baseDto as Expense);
+      repo.save.mockResolvedValue({ id: 'exp1', ...baseDto } as Expense);
 
       const result = await service.create(baseDto);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(groupService.getGroupMemberIds).toHaveBeenCalledWith('1');
+
       expect(imageService.getImage).toHaveBeenCalledWith('img1');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.create).toHaveBeenCalledWith(baseDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.save).toHaveBeenCalledWith(baseDto);
       expect(result).toEqual({ id: 'exp1', ...baseDto });
     });
 
     it('should create expense successfully with paidFor repartitionType PORTIONS', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         groupId: '1',
         amount: 100,
         paidBy: {
@@ -101,29 +105,33 @@ describe('ExpenseService', () => {
           ],
         },
         images: ['img1'],
-      } as any;
+      } as CreateExpenseDto;
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1, 2]);
       (imageService.getImage as jest.Mock).mockResolvedValue({});
-      repo.create.mockReturnValue(dto);
-      repo.save.mockResolvedValue({ id: 'exp2', ...dto });
+      repo.create.mockReturnValue(dto as Expense);
+      repo.save.mockResolvedValue({ id: 'exp2', ...dto } as Expense);
 
       const result = await service.create(dto);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(groupService.getGroupMemberIds).toHaveBeenCalledWith('1');
+
       expect(imageService.getImage).toHaveBeenCalledWith('img1');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.create).toHaveBeenCalledWith(dto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.save).toHaveBeenCalledWith(dto);
       expect(result).toEqual({ id: 'exp2', ...dto });
     });
 
     it('should throw if groupId missing', async () => {
-      const dto = { amount: 100 } as any;
+      const dto = { amount: 100 } as CreateExpenseDto;
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if users are not in group', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidBy: {
           repartitionType: 'AMOUNT',
@@ -133,7 +141,7 @@ describe('ExpenseService', () => {
           repartitionType: 'AMOUNT',
           repartition: [{ userId: 2, values: { amount: 100 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
@@ -149,7 +157,7 @@ describe('ExpenseService', () => {
     });
 
     it('should throw if a UserShareDto has neither amount nor share defined', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         groupId: '1',
         amount: 100,
         paidBy: {
@@ -160,7 +168,7 @@ describe('ExpenseService', () => {
           repartitionType: 'PORTIONS',
           repartition: [{ userId: 1, values: {} }], // missing share
         },
-      } as any;
+      } as CreateExpenseDto;
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
 
@@ -169,13 +177,13 @@ describe('ExpenseService', () => {
 
     // ----------------- VALIDATE PAID EDGE CASES -----------------
     it('should throw if paidBy repartitionType is PORTIONS', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidBy: {
           repartitionType: 'PORTIONS',
           repartition: [{ userId: 1, values: { share: 1 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
@@ -187,55 +195,56 @@ describe('ExpenseService', () => {
           repartitionType: 'INVALID',
           repartition: [{ userId: 1, values: { amount: 100 } }],
         },
-      } as any;
+      } as unknown as CreateExpenseDto;
+
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if paidBy amounts do not sum to total', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidBy: {
           repartitionType: 'AMOUNT',
           repartition: [{ userId: 1, values: { amount: 50 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if paidFor amounts do not sum to total', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidFor: {
           repartitionType: 'AMOUNT',
           repartition: [{ userId: 1, values: { amount: 50 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if paidFor shares are negative', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidFor: {
           repartitionType: 'PORTIONS',
           repartition: [{ userId: 1, values: { share: -1 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw if total shares < 1', async () => {
-      const dto = {
+      const dto: CreateExpenseDto = {
         ...baseDto,
         paidFor: {
           repartitionType: 'PORTIONS',
           repartition: [{ userId: 1, values: { share: 0 } }],
         },
-      } as any;
+      } as CreateExpenseDto;
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
@@ -244,11 +253,14 @@ describe('ExpenseService', () => {
   // ----------------- FIND ALL -----------------
   describe('findAll', () => {
     it('should return all expenses', async () => {
-      const expenses = [{ id: 'a3850469-6b37-425c-96cc-9e352dac28e1', groupId: '1' }] as any[];
+      const expenses: Expense[] = [
+        { id: 'a3850469-6b37-425c-96cc-9e352dac28e1', groupId: '1' } as Expense,
+      ];
       repo.find.mockResolvedValue(expenses);
 
       const result = await service.findAll('1');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.find).toHaveBeenCalledWith({ where: { groupId: '1' } });
       expect(result).toEqual(expenses);
     });
@@ -257,12 +269,19 @@ describe('ExpenseService', () => {
   // ----------------- FIND ONE -----------------
   describe('findOne', () => {
     it('should return single expense', async () => {
-      const expense = { id: 'a3850469-6b37-425c-96cc-9e352dac28e1' } as any;
+      const expense: Expense = {
+        id: 'a3850469-6b37-425c-96cc-9e352dac28e1',
+      } as Expense;
       repo.findOne.mockResolvedValue(expense);
 
-      const result = await service.findOne('a3850469-6b37-425c-96cc-9e352dac28e1');
+      const result = await service.findOne(
+        'a3850469-6b37-425c-96cc-9e352dac28e1',
+      );
 
-      expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'a3850469-6b37-425c-96cc-9e352dac28e1' } });
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: 'a3850469-6b37-425c-96cc-9e352dac28e1' },
+      });
       expect(result).toEqual(expense);
     });
   });
@@ -281,35 +300,50 @@ describe('ExpenseService', () => {
           repartitionType: 'AMOUNT',
           repartition: [{ userId: 1, values: { amount: 100 } }],
         },
-      } as any;
+      } as UpdateExpenseDto;
 
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
-      repo.update.mockResolvedValue({ affected: 1 } as any);
+      repo.update.mockResolvedValue({ affected: 1 } as UpdateResult);
 
-      const result = await service.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
+      const result = await service.update(
+        'a3850469-6b37-425c-96cc-9e352dac28e1',
+        dto,
+      );
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(groupService.getGroupMemberIds).toHaveBeenCalledWith('1');
-      expect(repo.update).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1', dto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(repo.update).toHaveBeenCalledWith(
+        'a3850469-6b37-425c-96cc-9e352dac28e1',
+        dto,
+      );
       expect(result).toEqual({ affected: 1 });
     });
 
     it('should throw if groupId missing', async () => {
-      const dto: UpdateExpenseDto = { amount: 100 } as any;
-      await expect(service.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto)).rejects.toThrow(BadRequestException);
+      const dto: UpdateExpenseDto = { amount: 100 } as UpdateExpenseDto;
+      await expect(
+        service.update('a3850469-6b37-425c-96cc-9e352dac28e1', dto),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
   // ----------------- REMOVE -----------------
   describe('remove', () => {
     it('should delete expense', async () => {
-      repo.findOne.mockResolvedValue({ images: ['img1'] } as any);
-      repo.delete.mockResolvedValue({ affected: 1 } as any);
+      repo.findOne.mockResolvedValue({ images: ['img1'] } as Expense);
+      repo.delete.mockResolvedValue({ affected: 1 } as DeleteResult);
 
-      const result = await service.remove('a3850469-6b37-425c-96cc-9e352dac28e1');
+      const result = await service.remove(
+        'a3850469-6b37-425c-96cc-9e352dac28e1',
+      );
 
       expect(imageService.deleteImage).toHaveBeenCalledWith('img1');
 
-      expect(repo.delete).toHaveBeenCalledWith('a3850469-6b37-425c-96cc-9e352dac28e1');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(repo.delete).toHaveBeenCalledWith(
+        'a3850469-6b37-425c-96cc-9e352dac28e1',
+      );
       expect(result).toEqual({ affected: 1 });
     });
   });

@@ -13,8 +13,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ImageService } from 'src/image/image.service';
 import { differenceInCalendarDays } from 'date-fns';
-import { getAugumentedDataset } from "src/types/holtwinters";
-import { MIN_EXPENSES_TO_PREDICT, PREDICTION_CUTOFF_AMOUNT } from 'src/utils/constants';
+import { getAugumentedDataset } from 'src/types/holtwinters';
+import {
+  MIN_EXPENSES_TO_PREDICT,
+  PREDICTION_CUTOFF_AMOUNT,
+} from 'src/utils/constants';
 
 @Injectable()
 export class GroupService {
@@ -47,7 +50,7 @@ export class GroupService {
     if (!group || !group.users) {
       return [];
     }
-    return group.users.map((user: any) => user.id);
+    return group.users.map((user: { id: number }) => user.id);
   }
 
   update(id: string, updateGroupDto: UpdateGroupDto) {
@@ -82,44 +85,56 @@ export class GroupService {
     });
   }
 
-  /* 
+  /*
    * Predict future expenses for a given group using Holt-Winters algorithm
    * @param groupId - The id of the group
    * @param startDate - The start date of the prediction
    * @param predictionLength - The length of the prediction
    * @returns The predicted expenses
    */
-  async predictGroupExpenses(groupId: string, startDate: Date, predictionLength: number) {
+  async predictGroupExpenses(
+    groupId: string,
+    startDate: Date,
+    predictionLength: number,
+  ) {
     // Validate predictionLength
     if (predictionLength < 1 || !Number.isInteger(predictionLength)) {
-      throw new BadRequestException('Prediction length must be at least 1 and an integer');
+      throw new BadRequestException(
+        'Prediction length must be at least 1 and an integer',
+      );
     }
 
-    let expenses = await this.parseGroupExpenses(groupId, startDate);
+    const expenses = await this.parseGroupExpenses(groupId, startDate);
     console.log('expenses', expenses);
 
     // Make sure there is enough data to predict. Add 2 * predictionLength to account for the extra data needed to predict as predictionLength increases
     if (expenses.length < MIN_EXPENSES_TO_PREDICT + 2 * predictionLength) {
-      throw new BadRequestException('Not enough expenses to predict in given period, or too many predicted expenses wanted');
+      throw new BadRequestException(
+        'Not enough expenses to predict in given period, or too many predicted expenses wanted',
+      );
     }
 
     const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
     console.log(predictedExpenses);
 
     if (!predictedExpenses) {
-      throw new InternalServerErrorException('Could not predict future expenses');
+      throw new InternalServerErrorException(
+        'Could not predict future expenses',
+      );
     }
 
     // Keep only the predicted expenses
-    predictedExpenses.augumentedDataset = predictedExpenses.augumentedDataset.slice(expenses.length);
+    predictedExpenses.augumentedDataset =
+      predictedExpenses.augumentedDataset.slice(expenses.length);
 
     // Truncate to 2 decimal places and remove any values less than PREDICTION_CUTOFF_AMOUNT
     for (let i = 0; i < predictedExpenses.augumentedDataset.length; i++) {
-      if ((predictedExpenses.augumentedDataset[i] as number) < PREDICTION_CUTOFF_AMOUNT) {
+      if (predictedExpenses.augumentedDataset[i] < PREDICTION_CUTOFF_AMOUNT) {
         predictedExpenses.augumentedDataset[i] = 0;
       }
 
-      predictedExpenses.augumentedDataset[i] = Math.trunc((predictedExpenses.augumentedDataset[i] as number) * 100) / 100;
+      predictedExpenses.augumentedDataset[i] =
+        Math.trunc(predictedExpenses.augumentedDataset[i] * 100) / 100;
     }
 
     return predictedExpenses.augumentedDataset;
@@ -152,12 +167,15 @@ export class GroupService {
     console.log(expensesWithDates);
 
     // Create array of expenses with 0 for each day
-    let expenses = new Array<number>(differenceInCalendarDays(new Date(), startDate)).fill(0);
+    let expenses = new Array<number>(
+      differenceInCalendarDays(new Date(), startDate),
+    ).fill(0);
 
     // Populate array with expenses
     for (let i = 0; i < expensesWithDates.length; i++) {
-      const index = differenceInCalendarDays(expensesWithDates[i].date, startDate) - 1;
-      expenses[index] += expensesWithDates[i].amount;  // Cumulate expenses of the same day
+      const index =
+        differenceInCalendarDays(expensesWithDates[i].date, startDate) - 1;
+      expenses[index] += expensesWithDates[i].amount; // Cumulate expenses of the same day
     }
 
     console.log(expenses);
@@ -173,10 +191,10 @@ export class GroupService {
     // If no non-zero expenses found in given period, return empty array
     if (firstNonZeroIndex === -1) {
       return [];
-    } else {  // Crop the beginning of the array to only include the non-zero expenses
+    } else {
+      // Crop the beginning of the array to only include the non-zero expenses
       expenses = expenses.slice(firstNonZeroIndex);
     }
-
 
     return expenses;
   }

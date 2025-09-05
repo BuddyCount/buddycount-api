@@ -14,7 +14,7 @@ export const dataSourceOptions: DataSourceOptions = {
   // logging: true,
   extra: {
     timezone: process.env.PGTZ || 'UTC', // Additional PostgreSQL-specific timezone setting
-  }
+  },
 };
 
 const dataSource = new DataSource(dataSourceOptions);

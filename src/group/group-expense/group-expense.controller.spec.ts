@@ -3,6 +3,8 @@ import { GroupExpenseController } from './group-expense.controller';
 import { ExpenseService } from 'src/expense/expense.service';
 import { BadRequestException } from '@nestjs/common';
 import { CreateExpenseDto } from 'src/expense/dto/create-expense.dto';
+import { Expense } from 'src/expense/entities/expense.entity';
+import { Currency, ExpenseCategory, RepartitionType } from 'src/utils/types';
 
 describe('GroupExpenseController', () => {
   let controller: GroupExpenseController;
@@ -30,24 +32,49 @@ describe('GroupExpenseController', () => {
     it('should call service.create when groupId matches', async () => {
       const dto: CreateExpenseDto = {
         groupId: '1',
-        description: 'Dinner',
+        name: 'Dinner',
+        category: ExpenseCategory.FOOD,
+        currency: Currency.CHF,
+        exchange_rate: 1.0,
+        date: new Date(),
         amount: 50,
-      } as any;
-      const created = { id: 'exp1', ...dto } as any;
+        paidBy: {
+          repartitionType: RepartitionType.AMOUNT,
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
+        paidFor: {
+          repartitionType: RepartitionType.AMOUNT,
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
+      } as CreateExpenseDto;
+      const created = { id: 'exp1', ...dto } as Expense;
       service.create.mockResolvedValue(created);
 
       const result = await controller.create(dto, '1');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.create).toHaveBeenCalledWith(dto);
       expect(result).toEqual(created);
     });
 
-    it('should throw BadRequestException when groupId does not match', async () => {
+    it('should throw BadRequestException when groupId does not match', () => {
       const dto: CreateExpenseDto = {
         groupId: '2',
-        description: 'Dinner',
+        name: 'Dinner',
+        category: ExpenseCategory.FOOD,
+        currency: Currency.CHF,
+        exchange_rate: 1.0,
+        date: new Date(),
         amount: 50,
-      } as any;
+        paidBy: {
+          repartitionType: RepartitionType.AMOUNT,
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
+        paidFor: {
+          repartitionType: RepartitionType.AMOUNT,
+          repartition: [{ userId: 1, values: { amount: 50 } }],
+        },
+      } as CreateExpenseDto;
 
       expect(() => controller.create(dto, '1')).toThrow(BadRequestException);
     });
@@ -56,13 +83,14 @@ describe('GroupExpenseController', () => {
   describe('findAll', () => {
     it('should call service.findAll and return result', async () => {
       const expenses = [
-        { id: 'exp1', groupId: '1', description: 'Dinner', amount: 50 },
-      ] as any[];
+        { id: 'exp1', groupId: '1', name: 'Dinner', amount: 50 } as Expense,
+      ] as Expense[];
       service.findAll.mockResolvedValue(expenses);
 
       const result = await controller.findAll('1');
 
-      expect(service.findAll).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(service.findAll).toHaveBeenCalledWith('1');
       expect(result).toEqual(expenses);
     });
 

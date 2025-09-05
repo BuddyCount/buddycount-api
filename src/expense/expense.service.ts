@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GroupService } from '../group/group.service';
 import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { ImageService } from '../image/image.service';
+import { RepartitionType } from '../utils/types';
 
 @Injectable()
 export class ExpenseService {
@@ -22,9 +23,9 @@ export class ExpenseService {
     expenseDto: CreateExpenseDto | UpdateExpenseDto,
   ): number[] {
     const paidByIds =
-      expenseDto.paidBy?.repartition?.map((r: any) => r.userId) || [];
+      expenseDto.paidBy?.repartition?.map((r: UserShareDto) => r.userId) || [];
     const paidForIds =
-      expenseDto.paidFor?.repartition?.map((r: any) => r.userId) || [];
+      expenseDto.paidFor?.repartition?.map((r: UserShareDto) => r.userId) || [];
     return Array.from(new Set([...paidByIds, ...paidForIds]));
   }
 
@@ -39,7 +40,7 @@ export class ExpenseService {
   }
 
   private validateUserShareValues(
-    userShare: UserShareDto[],
+    userShare: UserShareDto[] | undefined,
     expense: 'paidBy' | 'paidFor',
   ) {
     if (!userShare) return;
@@ -66,7 +67,7 @@ export class ExpenseService {
   ) {
     if (userShare !== undefined && userShare !== null) {
       const total = userShare
-        .map((r: any) => Number(r.values?.amount) || 0)
+        .map((r: UserShareDto) => Number(r.values?.amount) || 0)
         .reduce((a, b) => a + b, 0);
       if (total !== amount) {
         throw new BadRequestException(
@@ -94,7 +95,7 @@ export class ExpenseService {
 
     if (expense === 'paidFor') {
       const invalidShares = userShare
-        .map((r: any) => Number(r.values?.share) || 0)
+        .map((r: UserShareDto) => Number(r.values?.share) || 0)
         .filter((share: number) => share < 0);
       if (invalidShares.length > 0) {
         throw new BadRequestException(
@@ -103,7 +104,7 @@ export class ExpenseService {
       }
 
       const totalShares = userShare
-        .map((r: any) => Number(r.values?.share) || 0)
+        .map((r: UserShareDto) => Number(r.values?.share) || 0)
         .reduce((a, b) => a + b, 0);
       if (totalShares < 1) {
         throw new BadRequestException(
@@ -115,17 +116,16 @@ export class ExpenseService {
 
   private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
     // Check paidBy
-    this.validateUserShareValues(
-      expenseDto.paidBy?.repartition as any,
-      'paidBy',
-    );
-    if (expenseDto.paidBy?.repartitionType === 'AMOUNT') {
+    this.validateUserShareValues(expenseDto.paidBy?.repartition, 'paidBy');
+    if (expenseDto.paidBy?.repartitionType === RepartitionType.AMOUNT) {
       this.vaildateAmount(
         expenseDto.paidBy?.repartition,
         'paidBy',
         expenseDto.amount,
       );
-    } else if (expenseDto.paidBy?.repartitionType === 'PORTIONS') {
+    } else if (
+      expenseDto.paidBy?.repartitionType === RepartitionType.PORTIONS
+    ) {
       this.validatePortions(expenseDto.paidBy?.repartition, 'paidBy');
     } else {
       throw new BadRequestException(
@@ -134,17 +134,16 @@ export class ExpenseService {
     }
 
     // Check paidFor
-    this.validateUserShareValues(
-      expenseDto.paidFor?.repartition as any,
-      'paidFor',
-    );
-    if (expenseDto.paidFor?.repartitionType === 'AMOUNT') {
+    this.validateUserShareValues(expenseDto.paidFor?.repartition, 'paidFor');
+    if (expenseDto.paidFor?.repartitionType === RepartitionType.AMOUNT) {
       this.vaildateAmount(
         expenseDto.paidFor?.repartition,
         'paidFor',
         expenseDto.amount,
       );
-    } else if (expenseDto.paidFor?.repartitionType === 'PORTIONS') {
+    } else if (
+      expenseDto.paidFor?.repartitionType === RepartitionType.PORTIONS
+    ) {
       this.validatePortions(expenseDto.paidFor?.repartition, 'paidFor');
     } else {
       throw new BadRequestException(
@@ -193,7 +192,7 @@ export class ExpenseService {
             this.imageService.getImage(image),
           ),
         );
-      } catch (error) {
+      } catch {
         throw new BadRequestException('Image not found');
       }
     }

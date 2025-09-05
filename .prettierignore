@@ -1,0 +1,8 @@
+# Build outputs
+dist/
+
+# Dependencies
+node_modules/
+
+# Github dir (required for lint action)
+.github/

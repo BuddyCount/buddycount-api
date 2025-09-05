@@ -97,27 +97,30 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
-
 ## Using Docker
 
 ### Build the image
-```docker build -t buddycount-api:latest .```
+
+`docker build -t buddycount-api:latest .`
 
 ### Run the container
-```docker run -p 3000:3000 buddycount-api:latest``` (can use `--rm` to remove the container after it exits)
+
+`docker run -p 3000:3000 buddycount-api:latest` (can use `--rm` to remove the container after it exits)
 
 ### Re-tag the image for GHCR
-```docker tag buddycount-api:latest ghcr.io/buddycount/buddycount-api:latest```	
+
+`docker tag buddycount-api:latest ghcr.io/buddycount/buddycount-api:latest`
 
 ### Push to GitHub Container Registry [(more infos)](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
-```docker push ghcr.io/buddycount/buddycount-api:latest```
+
+`docker push ghcr.io/buddycount/buddycount-api:latest`
 
 ## Setting up the VM
-
 
 ### Install Docker
 
 From Docker's documentation:
+
 ```
 sudo apt update
 sudo apt-get update
@@ -144,7 +147,9 @@ sudo docker run hello-world
 ```
 
 ### Pull the image from GHCR
-```docker pull ghcr.io/buddycount/buddycount-api:latest```
+
+`docker pull ghcr.io/buddycount/buddycount-api:latest`
 
 ### Run the container
-```docker run -p 3000:3000 ghcr.io/buddycount/buddycount-api:latest```
+
+`docker run -p 3000:3000 ghcr.io/buddycount/buddycount-api:latest`

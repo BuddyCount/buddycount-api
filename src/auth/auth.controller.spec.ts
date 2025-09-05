@@ -25,22 +25,26 @@ describe('AuthController', () => {
   });
 
   describe('getToken', () => {
-    it('should return a token for valid deviceId', async () => {
+    it('should return a token for valid deviceId', () => {
       const deviceId = 'device-123';
       const token = { access_token: 'jwt-token' };
-      service.generateToken.mockReturnValue(token);
+
+      const spy = jest.spyOn(service, 'generateToken').mockReturnValue(token);
 
       const result = controller.getToken(deviceId);
 
-      expect(service.generateToken).toHaveBeenCalledWith(deviceId);
+      expect(spy).toHaveBeenCalledWith(deviceId);
       expect(result).toEqual(token);
     });
 
     it('should throw BadRequestException if deviceId is missing', () => {
-      expect(() => controller.getToken(null as any)).toThrow(
-        BadRequestException,
-      );
-      expect(() => controller.getToken(undefined)).toThrow(BadRequestException);
+      expect(() => {
+        controller.getToken(null as unknown as string);
+      }).toThrow(BadRequestException);
+
+      expect(() => {
+        controller.getToken(undefined);
+      }).toThrow(BadRequestException);
     });
   });
 });
