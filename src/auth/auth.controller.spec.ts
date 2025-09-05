@@ -25,6 +25,7 @@ describe('AuthController', () => {
   });
 
   describe('getToken', () => {
+    // Test that getToken returns a token for a valid deviceId
     it('should return a token for valid deviceId', () => {
       const deviceId = 'device-123';
       const token = { access_token: 'jwt-token' };
@@ -37,6 +38,7 @@ describe('AuthController', () => {
       expect(result).toEqual(token);
     });
 
+    // Test that getToken throws BadRequestException if deviceId is null or undefined
     it('should throw BadRequestException if deviceId is missing', () => {
       expect(() => {
         controller.getToken(null as unknown as string);

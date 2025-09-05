@@ -29,6 +29,7 @@ describe('GroupExpenseController', () => {
   });
 
   describe('create', () => {
+    // Test that service.create is called when groupId matches
     it('should call service.create when groupId matches', async () => {
       const dto: CreateExpenseDto = {
         groupId: '1',
@@ -57,6 +58,7 @@ describe('GroupExpenseController', () => {
       expect(result).toEqual(created);
     });
 
+    // Test that BadRequestException is thrown when groupId does not match
     it('should throw BadRequestException when groupId does not match', () => {
       const dto: CreateExpenseDto = {
         groupId: '2',
@@ -81,6 +83,7 @@ describe('GroupExpenseController', () => {
   });
 
   describe('findAll', () => {
+    // Test that service.findAll is called and returns expenses
     it('should call service.findAll and return result', async () => {
       const expenses = [
         { id: 'exp1', groupId: '1', name: 'Dinner', amount: 50 } as Expense,
@@ -94,6 +97,7 @@ describe('GroupExpenseController', () => {
       expect(result).toEqual(expenses);
     });
 
+    // Test that findAll throws if service fails
     it('should throw if service.findAll fails', async () => {
       service.findAll.mockRejectedValue(new Error('DB error'));
 

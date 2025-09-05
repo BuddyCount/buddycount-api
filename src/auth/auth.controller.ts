@@ -8,6 +8,8 @@ import { ApiTags, ApiBody } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Endpoint to obtain a JWT token for a device
+  // Public access, expects a POST request to /auth/device with a deviceId in the body
   @Public()
   @Post('device')
   @ApiBody({
@@ -24,7 +26,9 @@ export class AuthController {
     },
   })
   getToken(@Body('deviceId') deviceId?: string) {
+    // Throw an error if deviceId is missing
     if (!deviceId) throw new BadRequestException('deviceId is required');
+    // Call the AuthService to generate a token
     return this.authService.generateToken(deviceId);
   }
 }

@@ -70,6 +70,7 @@ describe('ExpenseService', () => {
       images: ['img1'],
     } as CreateExpenseDto;
 
+    // Test that expense is created successfully with valid data
     it('should create expense successfully', async () => {
       (groupService.getGroupMemberIds as jest.Mock).mockResolvedValue([1]);
       (imageService.getImage as jest.Mock).mockResolvedValue({});
@@ -89,6 +90,7 @@ describe('ExpenseService', () => {
       expect(result).toEqual({ id: 'exp1', ...baseDto });
     });
 
+    // Test creation when paidFor repartitionType is PORTIONS
     it('should create expense successfully with paidFor repartitionType PORTIONS', async () => {
       const dto: CreateExpenseDto = {
         groupId: '1',
@@ -125,11 +127,13 @@ describe('ExpenseService', () => {
       expect(result).toEqual({ id: 'exp2', ...dto });
     });
 
+    // Test that create throws if groupId is missing
     it('should throw if groupId missing', async () => {
       const dto = { amount: 100 } as CreateExpenseDto;
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
+    // Test that create throws if users are not part of the group
     it('should throw if users are not in group', async () => {
       const dto: CreateExpenseDto = {
         ...baseDto,
@@ -146,6 +150,7 @@ describe('ExpenseService', () => {
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
+    // Test that create throws if image is not found
     it('should throw if image not found', async () => {
       (imageService.getImage as jest.Mock).mockRejectedValue(
         new Error('Not found'),
@@ -156,6 +161,7 @@ describe('ExpenseService', () => {
       );
     });
 
+    // Test that create throws if a user share has neither amount nor share defined
     it('should throw if a UserShareDto has neither amount nor share defined', async () => {
       const dto: CreateExpenseDto = {
         groupId: '1',
@@ -251,6 +257,7 @@ describe('ExpenseService', () => {
   });
 
   // ----------------- FIND ALL -----------------
+  // Test that all expenses for a group are returned
   describe('findAll', () => {
     it('should return all expenses', async () => {
       const expenses: Expense[] = [
@@ -267,6 +274,7 @@ describe('ExpenseService', () => {
   });
 
   // ----------------- FIND ONE -----------------
+  // Test that a single expense is returned
   describe('findOne', () => {
     it('should return single expense', async () => {
       const expense: Expense = {
@@ -288,6 +296,7 @@ describe('ExpenseService', () => {
 
   // ----------------- UPDATE -----------------
   describe('update', () => {
+    // Test successful update of an expense
     it('should update expense successfully', async () => {
       const dto: UpdateExpenseDto = {
         groupId: '1',
@@ -320,6 +329,7 @@ describe('ExpenseService', () => {
       expect(result).toEqual({ affected: 1 });
     });
 
+    // Test that update throws if groupId is missing
     it('should throw if groupId missing', async () => {
       const dto: UpdateExpenseDto = { amount: 100 } as UpdateExpenseDto;
       await expect(
@@ -330,6 +340,7 @@ describe('ExpenseService', () => {
 
   // ----------------- REMOVE -----------------
   describe('remove', () => {
+    // Test that an expense is deleted and associated images are removed
     it('should delete expense', async () => {
       repo.findOne.mockResolvedValue({ images: ['img1'] } as Expense);
       repo.delete.mockResolvedValue({ affected: 1 } as DeleteResult);

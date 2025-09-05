@@ -21,11 +21,13 @@ describe('AuthService', () => {
     jwtService = module.get<JwtService>(JwtService);
   });
 
+  // Test that the service is properly instantiated
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   describe('generateToken', () => {
+    // Test that generateToken creates a valid JWT containing the deviceId
     it('should generate a JWT containing the deviceId', () => {
       const deviceId = 'device-123';
       const tokenObj = service.generateToken(deviceId);
@@ -40,6 +42,7 @@ describe('AuthService', () => {
   });
 
   describe('validateToken', () => {
+    // Test that validateToken returns the payload for a valid token
     it('should validate a valid JWT and return payload', () => {
       const deviceId = 'device-456';
       const tokenObj = service.generateToken(deviceId);
@@ -48,6 +51,7 @@ describe('AuthService', () => {
       expect(payload.deviceId).toBe(deviceId);
     });
 
+    // Test that validateToken throws an error for an invalid token
     it('should throw an error for an invalid token', () => {
       expect(() => service.validateToken('invalid.token')).toThrow();
     });

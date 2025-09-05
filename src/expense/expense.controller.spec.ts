@@ -29,6 +29,7 @@ describe('ExpenseController', () => {
   });
 
   describe('findOne', () => {
+    // Test that findOne calls the service and returns the expected expense
     it('should call service.findOne with numeric id and return result', async () => {
       const expense = {
         id: 'a3850469-6b37-425c-96cc-9e352dac28e1',
@@ -48,6 +49,7 @@ describe('ExpenseController', () => {
       expect(result).toEqual(expense);
     });
 
+    // Test that findOne throws if the service fails
     it('should throw if service.findOne fails', async () => {
       service.findOne.mockRejectedValue(new Error('DB error'));
 
@@ -58,6 +60,7 @@ describe('ExpenseController', () => {
   });
 
   describe('update', () => {
+    // Test that update calls the service with the DTO and returns result
     it('should call service.update with numeric id and return result', async () => {
       const dto: UpdateExpenseDto = {
         description: 'Updated',
@@ -79,6 +82,7 @@ describe('ExpenseController', () => {
       expect(result).toEqual(updated);
     });
 
+    // Test that update throws if the service fails
     it('should throw if service.update fails', async () => {
       const dto: UpdateExpenseDto = {
         description: 'Updated',
@@ -93,6 +97,7 @@ describe('ExpenseController', () => {
   });
 
   describe('remove', () => {
+    // Test that remove calls the service and returns the result
     it('should call service.remove with numeric id and return result', async () => {
       const deleted = { affected: 1 } as DeleteResult;
       service.remove.mockResolvedValue(deleted);
@@ -108,6 +113,7 @@ describe('ExpenseController', () => {
       expect(result).toEqual(deleted);
     });
 
+    // Test that remove throws if the service fails
     it('should throw if service.remove fails', async () => {
       service.remove.mockRejectedValue(new Error('DB error'));
 
