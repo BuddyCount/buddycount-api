@@ -54,6 +54,8 @@ export class CreateGroupDto {
   @ApiProperty({
     description: 'The currency of the group',
     example: Currency.CHF,
+    enum: Currency,
+    required: true,
   })
   currency: Currency;
 
