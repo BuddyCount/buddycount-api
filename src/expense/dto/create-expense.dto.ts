@@ -56,6 +56,7 @@ export class PaidDetailsDto {
   @ApiProperty({
     description: 'The repartition type',
     example: RepartitionType.AMOUNT,
+    enum: RepartitionType,
   })
   repartitionType: RepartitionType;
 
@@ -123,6 +124,7 @@ export class CreateExpenseDto {
   @ApiProperty({
     description: 'The category of the expense',
     example: ExpenseCategory.FOOD,
+    enum: ExpenseCategory,
   })
   category: ExpenseCategory;
 
@@ -131,6 +133,7 @@ export class CreateExpenseDto {
   @ApiProperty({
     description: 'The currency of the expense',
     example: Currency.CHF,
+    enum: Currency,
   })
   currency: Currency;
 
