@@ -13,7 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ImageService } from 'src/image/image.service';
 import { differenceInCalendarDays } from 'date-fns';
-import { getAugumentedDataset } from 'src/types/holtwinters';
+import { getAugumentedDataset } from 'src/utils/holtwinters';
 import {
   MIN_EXPENSES_TO_PREDICT,
   PREDICTION_CUTOFF_AMOUNT,
