@@ -5,16 +5,13 @@ import {
   Get,
   Param,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { CreateExpenseDto } from 'src/expense/dto/create-expense.dto';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Group Expenses')
-@UseGuards(AuthGuard('jwt'))
 @Controller('group/:groupId/expense')
 export class GroupExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}

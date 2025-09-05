@@ -30,7 +30,7 @@ describe('ImageService', () => {
     it('should return a StreamableFile if file exists and filename is safe', () => {
       const filename = 'test.jpg';
       (existsSync as jest.Mock).mockReturnValue(true);
-      const fakeStream = {} as any;
+      const fakeStream = {} as NodeJS.ReadableStream;
       (createReadStream as jest.Mock).mockReturnValue(fakeStream);
       (join as jest.Mock).mockReturnValue(`/uploads/${filename}`);
 
@@ -52,10 +52,13 @@ describe('ImageService', () => {
 
     it('should call isSafeFilename when getting an image', () => {
       const filename = 'test.jpg';
-      const isSafeSpy = jest.spyOn(service as any, 'isSafeFilename');
+      const isSafeSpy = jest.spyOn(
+        service as unknown as { isSafeFilename: (filename: string) => boolean },
+        'isSafeFilename',
+      );
 
       (existsSync as jest.Mock).mockReturnValue(true);
-      const fakeStream = {} as any;
+      const fakeStream = {} as NodeJS.ReadableStream;
       (createReadStream as jest.Mock).mockReturnValue(fakeStream);
       (join as jest.Mock).mockReturnValue(`/uploads/${filename}`);
 
@@ -67,7 +70,12 @@ describe('ImageService', () => {
     it('should throw BadRequestException if filename is unsafe', () => {
       const filename = '../file.jpg';
       const isSafeSpy = jest
-        .spyOn(service as any, 'isSafeFilename')
+        .spyOn(
+          service as unknown as {
+            isSafeFilename: (filename: string) => boolean;
+          },
+          'isSafeFilename',
+        )
         .mockReturnValue(false);
 
       expect(() => service.getImage(filename)).toThrow(BadRequestException);
@@ -84,7 +92,13 @@ describe('ImageService', () => {
         'a.b_c-123.jpeg',
       ];
       filenames.forEach((name) => {
-        expect((service as any).isSafeFilename(name)).toBe(true);
+        expect(
+          (
+            service as unknown as {
+              isSafeFilename: (filename: string) => boolean;
+            }
+          ).isSafeFilename(name),
+        ).toBe(true);
       });
     });
 
@@ -96,7 +110,13 @@ describe('ImageService', () => {
         'file/name.png',
       ];
       filenames.forEach((name) => {
-        expect((service as any).isSafeFilename(name)).toBe(false);
+        expect(
+          (
+            service as unknown as {
+              isSafeFilename: (filename: string) => boolean;
+            }
+          ).isSafeFilename(name),
+        ).toBe(false);
       });
     });
   });

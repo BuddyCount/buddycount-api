@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Query,
   ParseBoolPipe,
 } from '@nestjs/common';
@@ -14,11 +13,9 @@ import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Groups')
-@UseGuards(AuthGuard('jwt'))
 @Controller('group')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}

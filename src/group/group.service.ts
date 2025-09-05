@@ -50,7 +50,7 @@ export class GroupService {
     if (!group || !group.users) {
       return [];
     }
-    return group.users.map((user: any) => user.id);
+    return group.users.map((user: { id: number }) => user.id);
   }
 
   update(id: string, updateGroupDto: UpdateGroupDto) {

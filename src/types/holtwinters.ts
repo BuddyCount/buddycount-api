@@ -159,9 +159,9 @@ function seasonalIndices(
   period: number,
   seasons: number,
 ): number[] {
-  const savg = Array(seasons).fill(0);
-  const obsavg = Array(data.length).fill(0);
-  const si = Array(period).fill(0);
+  const savg = Array<number>(seasons).fill(0);
+  const obsavg = Array<number>(data.length).fill(0);
+  const si = Array<number>(period).fill(0);
 
   for (let i = 0; i < seasons; i++) {
     for (let j = 0; j < period; j++) {
@@ -201,7 +201,7 @@ function calcHoltWinters(
   const st: number[] = [];
   const bt: number[] = [];
   const it: number[] = [];
-  const ft: number[] = Array(len + m).fill(0);
+  const ft: number[] = Array<number>(len + m).fill(0);
 
   st[1] = st1;
   bt[1] = bt1;
