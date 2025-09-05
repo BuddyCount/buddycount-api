@@ -19,12 +19,6 @@ import { AuthGuard } from '@nestjs/passport';
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
 
-  // TODO: remove or edit this, no one should be able to access all expenses at once
-  // @Get()
-  // findAll() {
-  //   return this.expenseService.findAll();
-  // }
-
   @Get(':id')
   @ApiParam({
     name: 'id',
