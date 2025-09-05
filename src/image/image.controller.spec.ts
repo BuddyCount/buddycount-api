@@ -27,6 +27,7 @@ describe('ImageController', () => {
   });
 
   describe('uploadFile', () => {
+    // Test that uploading a file returns its filename
     it('should return filename if file exists', () => {
       const file = { filename: 'test.jpg' } as Express.Multer.File;
 
@@ -35,6 +36,7 @@ describe('ImageController', () => {
       expect(result).toEqual({ filename: 'test.jpg' });
     });
 
+    // Test that uploading an undefined file throws BadRequestException
     it('should throw BadRequestException if file is undefined', () => {
       expect(() =>
         controller.uploadFile(undefined as unknown as Express.Multer.File),
@@ -43,6 +45,7 @@ describe('ImageController', () => {
   });
 
   describe('getFile', () => {
+    // Test that getFile calls imageService.getImage and returns the StreamableFile
     it('should call imageService.getImage and return result', () => {
       const streamableFile = new StreamableFile(Buffer.from('test'));
       (imageService.getImage as jest.Mock).mockReturnValue(streamableFile);

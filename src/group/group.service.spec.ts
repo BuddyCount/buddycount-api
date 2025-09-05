@@ -54,6 +54,7 @@ describe('GroupService', () => {
   });
 
   describe('create', () => {
+    // Test that a group is created and saved in the repository
     it('should create and save a group', async () => {
       const dto: CreateGroupDto = { name: 'Test Group' } as CreateGroupDto;
       const created = { id: '1', ...dto } as Group;
@@ -72,6 +73,7 @@ describe('GroupService', () => {
   });
 
   describe('findOne', () => {
+    // Test that group can be fetched by id without relations
     it('should return a group by id', async () => {
       const group = { id: '1', name: 'Test' } as Group;
       repo.findOne.mockResolvedValue(group);
@@ -86,6 +88,7 @@ describe('GroupService', () => {
       expect(result).toEqual(group);
     });
 
+    // Test that group can be fetched by id including its expenses
     it('should return a group by id with its expenses', async () => {
       const group = { id: '1', name: 'Test' } as Group;
       repo.findOne.mockResolvedValue(group);
@@ -102,6 +105,7 @@ describe('GroupService', () => {
   });
 
   describe('getGroupMemberIds', () => {
+    // Test returns empty array if group not found
     it('should return empty array if no group found', async () => {
       repo.findOne.mockResolvedValue(null);
 
@@ -110,6 +114,7 @@ describe('GroupService', () => {
       expect(result).toEqual([]);
     });
 
+    // Test returns empty array if group has no users
     it('should return empty array if group has no users', async () => {
       repo.findOne.mockResolvedValue({
         id: '1',
@@ -121,6 +126,7 @@ describe('GroupService', () => {
       expect(result).toEqual([]);
     });
 
+    // Test returns array of user ids if group has users
     it('should return array of user ids if group has users', async () => {
       const group = {
         id: '1',
@@ -135,6 +141,7 @@ describe('GroupService', () => {
   });
 
   describe('update', () => {
+    // Test that group is updated by id
     it('should update a group by id', async () => {
       const dto: UpdateGroupDto = { name: 'Updated' } as UpdateGroupDto;
       const updateResult = { affected: 1 } as UpdateResult;
@@ -149,6 +156,7 @@ describe('GroupService', () => {
   });
 
   describe('remove', () => {
+    // Test that group is deleted by id
     it('should delete a group by id', async () => {
       const deleteResult = { affected: 1 } as DeleteResult;
       (expenseService.findAll as jest.Mock).mockResolvedValue([]);
@@ -163,6 +171,7 @@ describe('GroupService', () => {
   });
 
   describe('join', () => {
+    // Test that group is returned when linkToken matches
     it('should return group id when linkToken matches', async () => {
       const group = { id: '1' } as Group;
       repo.findOne.mockResolvedValue(group);
@@ -177,6 +186,7 @@ describe('GroupService', () => {
       expect(result).toEqual(group);
     });
 
+    // Test that null is returned if no group found with linkToken
     it('should return null if no group found with linkToken', async () => {
       repo.findOne.mockResolvedValue(null);
 

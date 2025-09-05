@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+// Define the shape of the JWT payload
 export interface JwtPayload {
   deviceId: string;
 }

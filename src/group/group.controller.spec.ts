@@ -32,6 +32,7 @@ describe('GroupController', () => {
   });
 
   describe('create', () => {
+    // Test that service.create is called and returns the created group
     it('should call service.create and return result', async () => {
       const dto: CreateGroupDto = { name: 'Test Group' } as CreateGroupDto;
       const created = { id: '1', ...dto } as Group;
@@ -44,6 +45,7 @@ describe('GroupController', () => {
       expect(result).toEqual(created);
     });
 
+    // Test that create throws if service.create fails
     it('should throw if service.create fails', async () => {
       const dto: CreateGroupDto = { name: 'Test Group' } as CreateGroupDto;
       service.create.mockRejectedValue(new Error('DB error'));
@@ -53,6 +55,7 @@ describe('GroupController', () => {
   });
 
   describe('findOne', () => {
+    // Test that service.findOne returns the requested group
     it('should call service.findOne and return group', async () => {
       const group = { id: '1', name: 'Test' } as Group;
       service.findOne.mockResolvedValue(group);
@@ -64,6 +67,7 @@ describe('GroupController', () => {
       expect(result).toEqual(group);
     });
 
+    // Test that findOne throws if service.findOne fails
     it('should throw if service.findOne fails', async () => {
       service.findOne.mockRejectedValue(new Error('Not found'));
 
@@ -72,6 +76,7 @@ describe('GroupController', () => {
   });
 
   describe('update', () => {
+    // Test that service.update is called and returns update result
     it('should call service.update and return result', async () => {
       const dto: UpdateGroupDto = { name: 'Updated' } as UpdateGroupDto;
       const updated = { affected: 1 } as UpdateResult;
@@ -84,6 +89,7 @@ describe('GroupController', () => {
       expect(result).toEqual(updated);
     });
 
+    // Test that update throws if service.update fails
     it('should throw if service.update fails', async () => {
       const dto: UpdateGroupDto = { name: 'Updated' } as UpdateGroupDto;
       service.update.mockRejectedValue(new Error('DB error'));
@@ -93,6 +99,7 @@ describe('GroupController', () => {
   });
 
   describe('remove', () => {
+    // Test that service.remove is called and returns delete result
     it('should call service.remove and return result', async () => {
       const deleted = { affected: 1 } as DeleteResult;
       service.remove.mockResolvedValue(deleted);
@@ -104,6 +111,7 @@ describe('GroupController', () => {
       expect(result).toEqual(deleted);
     });
 
+    // Test that remove throws if service.remove fails
     it('should throw if service.remove fails', async () => {
       service.remove.mockRejectedValue(new Error('DB error'));
 
@@ -112,6 +120,7 @@ describe('GroupController', () => {
   });
 
   describe('join', () => {
+    // Test that service.join is called with a token and returns the joined group
     it('should call service.join and return result', async () => {
       const group = { id: '1' } as Group;
       service.join.mockResolvedValue(group);
@@ -123,6 +132,7 @@ describe('GroupController', () => {
       expect(result).toEqual(group);
     });
 
+    // Test that join throws if service.join fails
     it('should throw if service.join fails', async () => {
       service.join.mockRejectedValue(new Error('DB error'));
 

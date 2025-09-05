@@ -27,6 +27,7 @@ describe('ImageService', () => {
   });
 
   describe('getImage', () => {
+    // Test that getImage returns a StreamableFile when file exists and filename is safe
     it('should return a StreamableFile if file exists and filename is safe', () => {
       const filename = 'test.jpg';
       (existsSync as jest.Mock).mockReturnValue(true);
@@ -41,6 +42,7 @@ describe('ImageService', () => {
       expect(result).toBeInstanceOf(StreamableFile);
     });
 
+    // Test that NotFoundException is thrown if file does not exist
     it('should throw NotFoundException if file does not exist', () => {
       const filename = 'file.jpg';
       (existsSync as jest.Mock).mockReturnValue(false);
@@ -50,6 +52,7 @@ describe('ImageService', () => {
       expect(existsSync).toHaveBeenCalledWith(`/uploads/${filename}`);
     });
 
+    // Test that isSafeFilename is called when getting an image
     it('should call isSafeFilename when getting an image', () => {
       const filename = 'test.jpg';
       const isSafeSpy = jest.spyOn(
@@ -67,6 +70,7 @@ describe('ImageService', () => {
       expect(isSafeSpy).toHaveBeenCalledWith(filename);
     });
 
+    // Test that BadRequestException is thrown for unsafe filenames
     it('should throw BadRequestException if filename is unsafe', () => {
       const filename = '../file.jpg';
       const isSafeSpy = jest
@@ -84,6 +88,7 @@ describe('ImageService', () => {
   });
 
   describe('isSafeFilename', () => {
+    // Test that valid filenames are accepted
     it('should allow valid filenames', () => {
       const filenames = [
         'test.jpg',
@@ -102,6 +107,7 @@ describe('ImageService', () => {
       });
     });
 
+    // Test that unsafe filenames are rejected
     it('should reject unsafe filenames', () => {
       const filenames = [
         '../file.jpg',
