@@ -24,7 +24,7 @@ $ npm run start:dev
 
 You can access the API using :
 
-- `http://localhost:3000` is the API's root endpoint. From there, you can access */group*, */expense*, ...
+- `http://localhost:3000` is the API's root endpoint. From there, you can access _/group_, _/expense_, ...
 - `http://localhost:3000/swagger` for the Swagger UI. This is the most convenient way to test and see the API's endpoints.
 - `http://localhost:8080/` for the Adminer UI. This is the most convenient way to manage the database. To access it, login with these settings : system=PostgreSQL, server=db, username=backend, password=backend, database=backend.
 
@@ -41,6 +41,7 @@ Run the container
 ```
 docker run -p 3000:3000 buddycount-api:latest
 ```
+
 (use `--rm` to remove the container after it stops)
 
 You can also run the image directly from the GitHub Container Registry :
