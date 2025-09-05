@@ -13,7 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ImageService } from 'src/image/image.service';
 import { differenceInCalendarDays } from 'date-fns';
-import { getAugumentedDataset } from 'src/types/holtwinters';
+import { getAugumentedDataset } from 'src/utils/holtwinters';
 import {
   MIN_EXPENSES_TO_PREDICT,
   PREDICTION_CUTOFF_AMOUNT,
@@ -29,6 +29,11 @@ export class GroupService {
     private readonly imageService: ImageService,
   ) {}
 
+  /*
+   * Create a group
+   * @param createGroupDto - The group dto
+   * @returns The created group
+   */
   create(createGroupDto: CreateGroupDto) {
     // Make sure user ids are unique
     this.validateUserIndexDto(createGroupDto.users);
@@ -37,22 +42,43 @@ export class GroupService {
     return this.groupRepository.save(group);
   }
 
+  /*
+   * Find a group
+   * @param id - The id of the group
+   * @param withExpenses - Whether to fetch the expenses
+   * @returns The group
+   */
   findOne(id: string, withExpenses: boolean) {
+    // Only fetch expenses if needed
     const relations = withExpenses ? ['expenses'] : [];
 
     return this.groupRepository.findOne({ where: { id }, relations });
   }
 
+  /*
+   * Get the member ids of a group
+   * @param id - The id of the group
+   * @returns The member ids
+   */
   async getGroupMemberIds(id: string): Promise<number[]> {
     const group = await this.groupRepository.findOne({
       where: { id: id },
     });
+
+    // Return empty array if group not found or has no users
     if (!group || !group.users) {
       return [];
     }
+
     return group.users.map((user: { id: number }) => user.id);
   }
 
+  /*
+   * Update a group
+   * @param id - The id of the group
+   * @param updateGroupDto - The group dto
+   * @returns The updated group
+   */
   update(id: string, updateGroupDto: UpdateGroupDto) {
     // Make sure user ids are unique
     this.validateUserIndexDto(updateGroupDto.users);
@@ -60,6 +86,11 @@ export class GroupService {
     return this.groupRepository.update(id, updateGroupDto);
   }
 
+  /*
+   * Remove a group
+   * @param id - The id of the group
+   * @returns A confirmation object
+   */
   async remove(id: string) {
     const expenses = await this.expenseService.findAll(id);
 
@@ -77,8 +108,12 @@ export class GroupService {
     return this.groupRepository.delete(id);
   }
 
+  /*
+   * Join a group
+   * @param linkToken - The link token
+   * @returns The group id
+   */
   join(linkToken: string) {
-    // TODO: check auth
     return this.groupRepository.findOne({
       where: { linkToken },
       select: ['id'],
@@ -105,7 +140,6 @@ export class GroupService {
     }
 
     const expenses = await this.parseGroupExpenses(groupId, startDate);
-    console.log('expenses', expenses);
 
     // Make sure there is enough data to predict. Add 2 * predictionLength to account for the extra data needed to predict as predictionLength increases
     if (expenses.length < MIN_EXPENSES_TO_PREDICT + 2 * predictionLength) {
@@ -115,7 +149,6 @@ export class GroupService {
     }
 
     const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
-    console.log(predictedExpenses);
 
     if (!predictedExpenses) {
       throw new InternalServerErrorException(
@@ -140,6 +173,10 @@ export class GroupService {
     return predictedExpenses.augumentedDataset;
   }
 
+  /*
+   * Validate that user ids are unique in a UserIndexDto array
+   * @param userIndexDto - The user index dto
+   */
   private validateUserIndexDto(userIndexDto?: UserIndexDto[]) {
     const indexes = userIndexDto?.map((userIndexDto) => userIndexDto.id) || [];
     const uniqueIndexes = new Set(indexes);
@@ -149,6 +186,12 @@ export class GroupService {
     }
   }
 
+  /*
+   * Parse the group expenses
+   * @param groupId - The id of the group
+   * @param startDate - The start date of the expenses to be considered
+   * @returns The expenses summed up for each day between startDate and today
+   */
   private async parseGroupExpenses(groupId: string, startDate: Date) {
     const group = await this.groupRepository.findOne({
       where: { id: groupId, expenses: { date: MoreThanOrEqual(startDate) } },
@@ -164,8 +207,6 @@ export class GroupService {
       date: expense.date,
     }));
 
-    console.log(expensesWithDates);
-
     // Create array of expenses with 0 for each day
     let expenses = new Array<number>(
       differenceInCalendarDays(new Date(), startDate),
@@ -177,8 +218,6 @@ export class GroupService {
         differenceInCalendarDays(expensesWithDates[i].date, startDate) - 1;
       expenses[index] += expensesWithDates[i].amount; // Cumulate expenses of the same day
     }
-
-    console.log(expenses);
 
     // Keep only from first non-zero expense to the end + add a small amount to the null expenses
     let firstNonZeroIndex = -1;
