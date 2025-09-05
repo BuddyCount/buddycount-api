@@ -43,8 +43,6 @@ export class Group {
   @VersionColumn()
   version: number;
 
-  // TODO: add icons, ...
-
   /* Relations */
 
   // Expense

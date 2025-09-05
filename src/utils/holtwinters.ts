@@ -38,7 +38,7 @@ export function getAugumentedDataset(
   let prediction: number[] = [];
   let err = Infinity;
 
-  // TODO: rewrite this brute force with Levenberg-Marquardt equation
+  // Rewrite this brute force with Levenberg-Marquardt equation
   initialparams.forEach((a) => {
     initialparams.forEach((b) => {
       initialparams.forEach((g) => {

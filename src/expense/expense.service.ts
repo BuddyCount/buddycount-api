@@ -19,6 +19,11 @@ export class ExpenseService {
     private readonly imageService: ImageService,
   ) {}
 
+  /*
+   * Get the user ids concerned by an expense
+   * @param expenseDto - The expense dto
+   * @returns The user ids in the paidBy and paidFor repartitions
+   */
   private getConcernedUserIds(
     expenseDto: CreateExpenseDto | UpdateExpenseDto,
   ): number[] {
@@ -29,6 +34,11 @@ export class ExpenseService {
     return Array.from(new Set([...paidByIds, ...paidForIds]));
   }
 
+  /*
+   * Validate that the given user ids are in the group
+   * @param groupId - The id of the group
+   * @param userIds - The user ids
+   */
   private async validateUsersInGroup(groupId: string, userIds: number[]) {
     const groupMembers = await this.groupService.getGroupMemberIds(groupId);
     const invalidUsers = userIds.filter((uid) => !groupMembers.includes(uid));
@@ -39,6 +49,11 @@ export class ExpenseService {
     }
   }
 
+  /*
+   * Validate that the user share values are valid (either amount or share is required)
+   * @param userShare - The user share values
+   * @param expense - The expense type
+   */
   private validateUserShareValues(
     userShare: UserShareDto[] | undefined,
     expense: 'paidBy' | 'paidFor',
@@ -60,6 +75,12 @@ export class ExpenseService {
     });
   }
 
+  /*
+   * Validate that the amount of the user share values matches the expense amount
+   * @param userShare - The user share values
+   * @param expense - The expense type
+   * @param amount - The expense amount
+   */
   private vaildateAmount(
     userShare: UserShareDto[],
     expense: 'paidBy' | 'paidFor',
@@ -79,6 +100,11 @@ export class ExpenseService {
     }
   }
 
+  /*
+   * Validate that the portions of the user share values are valid
+   * @param userShare - The user share values
+   * @param expense - The expense type
+   */
   private validatePortions(
     userShare: UserShareDto[],
     expense: 'paidBy' | 'paidFor',
@@ -114,6 +140,10 @@ export class ExpenseService {
     }
   }
 
+  /*
+   * Validate that the paidBy and paidFor repartitions are valid
+   * @param expenseDto - The expense dto
+   */
   private validatePaid(expenseDto: CreateExpenseDto | UpdateExpenseDto) {
     // Check paidBy
     this.validateUserShareValues(expenseDto.paidBy?.repartition, 'paidBy');
@@ -152,6 +182,11 @@ export class ExpenseService {
     }
   }
 
+  /*
+   * Validate that the user ids in the paidBy and paidFor repartitions are unique
+   * @param paidBy - The paidBy repartition
+   * @param paidFor - The paidFor repartition
+   */
   private validateUniqueUsers(
     paidBy?: UserShareDto[],
     paidFor?: UserShareDto[],
@@ -168,11 +203,16 @@ export class ExpenseService {
     }
   }
 
+  /*
+   * Create an expense
+   * @param createExpenseDto - The expense dto
+   */
   async create(createExpenseDto: CreateExpenseDto) {
     if (!createExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
     }
 
+    // Data validations
     this.validateUniqueUsers(
       createExpenseDto.paidBy.repartition,
       createExpenseDto.paidFor.repartition,
@@ -184,7 +224,6 @@ export class ExpenseService {
     this.validatePaid(createExpenseDto);
 
     // If images links are provided, make sure they are valid
-    // TODO: maybe securise this, now anyone can access any link
     if (createExpenseDto.images) {
       try {
         await Promise.all(
@@ -201,14 +240,30 @@ export class ExpenseService {
     return this.expenseRepository.save(expense);
   }
 
+  /*
+   * Find all expenses for a group
+   * @param groupId - The id of the group
+   * @returns The expenses
+   */
   findAll(groupId: string) {
     return this.expenseRepository.find({ where: { groupId } });
   }
 
+  /*
+   * Find one expense
+   * @param id - The id of the expense
+   * @returns The expense
+   */
   findOne(id: string) {
     return this.expenseRepository.findOne({ where: { id } });
   }
 
+  /*
+   * Update an expense
+   * @param id - The id of the expense
+   * @param updateExpenseDto - The expense dto
+   * @returns The updated expense
+   */
   async update(id: string, updateExpenseDto: UpdateExpenseDto) {
     if (!updateExpenseDto.groupId) {
       throw new BadRequestException('groupId is required');
@@ -227,6 +282,11 @@ export class ExpenseService {
     return this.expenseRepository.update(id, updateExpenseDto);
   }
 
+  /*
+   * Remove an expense
+   * @param id - The id of the expense
+   * @returns A confirmation object
+   */
   async remove(id: string) {
     const expense = await this.expenseRepository.findOne({ where: { id } });
 
