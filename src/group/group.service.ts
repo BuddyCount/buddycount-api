@@ -90,19 +90,24 @@ export class GroupService {
    * @returns The predicted expenses
    */
   async predictGroupExpenses(groupId: string, startDate: Date, predictionLength: number) {
+    // Validate predictionLength
+    if (predictionLength < 1 || !Number.isInteger(predictionLength)) {
+      throw new BadRequestException('Prediction length must be at least 1 and an integer');
+    }
+
     let expenses = await this.parseGroupExpenses(groupId, startDate);
     console.log('expenses', expenses);
 
     // Make sure there is enough data to predict. Add 2 * predictionLength to account for the extra data needed to predict as predictionLength increases
     if (expenses.length < MIN_EXPENSES_TO_PREDICT + 2 * predictionLength) {
-      return new BadRequestException('Not enough expenses to predict in given period, or too many predicted expenses wanted');
+      throw new BadRequestException('Not enough expenses to predict in given period, or too many predicted expenses wanted');
     }
 
     const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
     console.log(predictedExpenses);
 
     if (!predictedExpenses) {
-      return new InternalServerErrorException('Could not predict future expenses');
+      throw new InternalServerErrorException('Could not predict future expenses');
     }
 
     // Keep only the predicted expenses
