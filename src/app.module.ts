@@ -9,9 +9,14 @@ import { GroupModule } from './group/group.module';
 import { ImageModule } from './image/image.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot(dataSourceOptions),
     ExpenseModule,
     GroupModule,

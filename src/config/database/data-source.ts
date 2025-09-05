@@ -12,6 +12,9 @@ export const dataSourceOptions: DataSourceOptions = {
   entities: [join(__dirname, '..', '..', '**', '*.entity.{js,ts}')],
   synchronize: true, //FIXME: WARNING DANGEROUS FOR PRODUCTION
   // logging: true,
+  extra: {
+    timezone: process.env.PGTZ || 'UTC', // Additional PostgreSQL-specific timezone setting
+  }
 };
 
 const dataSource = new DataSource(dataSourceOptions);
