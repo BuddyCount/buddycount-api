@@ -236,8 +236,10 @@ export class ExpenseService {
     }
 
     // Delete all images related to the expense
-    for (const image of expense.images) {
-      this.imageService.deleteImage(image);
+    if (expense.images) {
+      for (const image of expense.images) {
+        this.imageService.deleteImage(image);
+      }
     }
 
     return this.expenseRepository.delete(id);
