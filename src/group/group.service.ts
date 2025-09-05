@@ -6,11 +6,13 @@ import {
 } from '@nestjs/common';
 import { CreateGroupDto, UserIndexDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Group } from './entities/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseService } from 'src/expense/expense.service';
 import { ImageService } from 'src/image/image.service';
+import { differenceInCalendarDays } from 'date-fns';
+import { getAugumentedDataset } from "src/types/holtwinters";
 
 @Injectable()
 export class GroupService {
@@ -78,6 +80,18 @@ export class GroupService {
     });
   }
 
+  async predictGroupExpenses(groupId: string, startDate: Date) {
+    const expenses = await this.parseGroupExpenses(groupId, startDate);
+    console.log(expenses);
+
+    const predictionLength = 4;
+
+    const predictedExpenses = getAugumentedDataset(expenses, predictionLength);
+    console.log(predictedExpenses);
+
+    return predictedExpenses;
+  }
+
   private validateUserIndexDto(userIndexDto?: UserIndexDto[]) {
     const indexes = userIndexDto?.map((userIndexDto) => userIndexDto.id) || [];
     const uniqueIndexes = new Set(indexes);
@@ -85,5 +99,53 @@ export class GroupService {
     if (indexes.length !== uniqueIndexes.size) {
       throw new BadRequestException('User ids in a group must be unique');
     }
+  }
+
+  private async parseGroupExpenses(groupId: string, startDate: Date) {
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId, expenses: { date: MoreThan(startDate) } },
+      relations: ['expenses'],
+    });
+
+    if (!group) {
+      throw new BadRequestException('Group not found');
+    }
+
+    const expensesWithDates = group.expenses.map((expense) => ({
+      amount: expense.amount,
+      date: expense.date,
+    }));
+
+    // Create array of expenses with 0 for each day
+    let expenses = new Array<number>(differenceInCalendarDays(new Date(), startDate)).fill(0);
+
+    // Populate array with expenses
+    for (let i = 0; i < expensesWithDates.length; i++) {
+      const index = differenceInCalendarDays(expensesWithDates[i].date, startDate);
+      expenses[index] += expensesWithDates[i].amount;  // Cumulate expenses of the same day
+    }
+
+    // Keep only from first non-zero expense to the end + add a small amount to the null expenses
+    let firstNonZeroIndex = -1;
+    for (let i = 0; i < expenses.length; i++) {
+      if (firstNonZeroIndex === -1 && expenses[i] > 0) {
+        firstNonZeroIndex = i;
+      }
+
+      if (firstNonZeroIndex !== -1 && expenses[i] === 0) {
+        expenses[i] = .01;
+        continue;
+      }
+    }
+
+    // If no non-zero expenses found in given period, return empty array
+    if (firstNonZeroIndex === -1) {
+      return [];
+    } else {  // Crop the beginning of the array to only include the non-zero expenses
+      expenses = expenses.slice(firstNonZeroIndex);
+    }
+
+
+    return expenses;
   }
 }
